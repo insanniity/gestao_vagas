@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil | Gestão de Vagas</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS v4 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 relative overflow-x-hidden">
+    <!-- Efeitos de iluminação de fundo -->
+    <div class="fixed -top-40 -left-40 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="fixed top-1/2 -right-40 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Barra de Navegação Superior -->
+    <header class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Logo / Brand -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-blue-500 rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <span class="text-lg font-bold tracking-tight text-white">Gestão de Vagas</span>
+            </div>
+
+            <!-- Navegação Desktop -->
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+                <a href="#" class="hover:text-white transition-colors">Vagas Disponíveis</a>
+                <a href="#" class="hover:text-white transition-colors">Minhas Candidaturas</a>
+                <a href="#" class="text-indigo-400 font-semibold flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                    Meu Perfil
+                </a>
+            </nav>
+
+            <!-- Ações do Usuário -->
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="openLogoutModal()" class="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/30 px-3.5 py-1.5 rounded-xl bg-slate-900/60 transition-all cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Sair</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8 relative z-10">
+
+        <!-- Banner / Cabeçalho do Perfil -->
+        <section class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                    <!-- Avatar com Gradiente e Inicial -->
+                    <div class="relative group">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-blue-500 p-0.5 shadow-xl shadow-indigo-600/30">
+                            <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-2xl sm:text-3xl font-bold text-indigo-400">
+                                <span th:text="${loginRequest != null and loginRequest.username != null ? #strings.substring(loginRequest.username, 0, 1).toUpperCase() : 'U'}">U</span>
+                            </div>
+                        </div>
+                        <!-- Botão de alterar foto -->
+                        <button type="button" title="Alterar foto de perfil" class="absolute -bottom-1 -right-1 p-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-md transition-colors cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Dados Principais -->
+                    <div class="space-y-1.5">
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight" 
+                                th:text="${loginRequest != null and loginRequest.username != null ? loginRequest.username : 'Usuário Conectado'}">
+                                usuario@exemplo.com
+                            </h1>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Disponível para contratação
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-400 flex items-center gap-2">
+                            <span>Desenvolvedor Full Stack</span>
+                            <span class="text-slate-600">•</span>
+                            <span>São Paulo, Brasil (Remoto)</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação Rápida -->
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <button type="button" class="flex-1 sm:flex-none px-4 py-2.5 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-200 text-xs sm:text-sm font-medium rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Exportar CV
+                    </button>
+                    <button type="button" class="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs sm:text-sm font-medium rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        Editar Perfil
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Grid de Conteúdo: Coluna Principal + Coluna Lateral -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Coluna Principal (2 colunas) -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Informações Pessoais / Formulário de Dados -->
+                <section class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <h2 class="text-lg font-semibold text-white flex items-center gap-2.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Informações Pessoais
+                        </h2>
+                        <span class="text-xs text-slate-500">Atualizado recentemente</span>
+                    </div>
+
+                    <form action="#" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Nome Completo</label>
+                                <input type="text" value="Gabriel Santos" class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">E-mail Profissional</label>
+                                <input type="email" th:value="${loginRequest != null and loginRequest.username != null ? loginRequest.username : 'teste@insannity.dev'}" class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Telefone / WhatsApp</label>
+                                <input type="text" value="(11) 98765-4321" class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1.5">Localização</label>
+                                <input type="text" value="São Paulo, SP" class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5">Resumo Profissional</label>
+                            <textarea rows="4" class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none">Desenvolvedor com experiência sólida no ecossistema Java, Spring Boot e bancos de dados relacionais e NoSQL (MongoDB). Focado em arquiteturas escaláveis, código limpo e integração contínua.</textarea>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button type="button" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-600/25 cursor-pointer">
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Candidaturas Recentes -->
+                <section class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <h2 class="text-lg font-semibold text-white flex items-center gap-2.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Minhas Candidaturas
+                        </h2>
+                        <a href="#" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium">Ver todas</a>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- Item 1 -->
+                        <div class="p-4 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-colors">
+                            <div class="space-y-1">
+                                <h3 class="text-sm font-semibold text-white">Desenvolvedor Java Sênior</h3>
+                                <p class="text-xs text-slate-400">TechCorp Solutions • Remoto • Aplicado há 2 dias</p>
+                            </div>
+                            <span class="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                                Em Triagem
+                            </span>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="p-4 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-colors">
+                            <div class="space-y-1">
+                                <h3 class="text-sm font-semibold text-white">Engenheiro de Backend (Spring / MongoDB)</h3>
+                                <p class="text-xs text-slate-400">InovaPay Finance • Híbrido • Aplicado há 5 dias</p>
+                            </div>
+                            <span class="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                                Entrevista Técnica
+                            </span>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="p-4 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-colors">
+                            <div class="space-y-1">
+                                <h3 class="text-sm font-semibold text-white">Arquiteto de Software Java</h3>
+                                <p class="text-xs text-slate-400">CloudSystems Inc • Remoto • Aplicado há 12 dias</p>
+                            </div>
+                            <span class="self-start sm:self-auto px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                Aprovado
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Coluna Lateral (1 coluna) -->
+            <div class="space-y-8">
+                
+                <!-- Habilidades Técnicas -->
+                <section class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 shadow-xl shadow-slate-950/40 space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                            Competências
+                        </h2>
+                        <button type="button" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium">+ Adicionar</button>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-950 border border-slate-800 text-slate-300">Java 21</span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-950 border border-slate-800 text-slate-300">Spring Boot</span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-950 border border-slate-800 text-slate-300">MongoDB</span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-950 border border-slate-800 text-slate-300">RESTful APIs</span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-950 border border-slate-800 text-slate-300">Docker</span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-950 border border-slate-800 text-slate-300">Tailwind CSS</span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-950 border border-slate-800 text-slate-300">Microserviços</span>
+                        <span class="px-3 py-1 rounded-lg text-xs font-medium bg-slate-950 border border-slate-800 text-slate-300">Git & GitHub</span>
+                    </div>
+                </section>
+
+                <!-- Links e Redes Profissionais -->
+                <section class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 shadow-xl shadow-slate-950/40 space-y-5">
+                    <h2 class="text-base font-semibold text-white border-b border-slate-800 pb-4 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                        Redes & Portfólio
+                    </h2>
+
+                    <div class="space-y-3">
+                        <a href="#" class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex items-center justify-between text-xs text-slate-300 hover:border-slate-700 hover:text-white transition-colors">
+                            <span class="flex items-center gap-2.5">
+                                <span class="font-bold text-indigo-400">in</span>
+                                <span>linkedin.com/in/usuario</span>
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </a>
+
+                        <a href="#" class="p-3 bg-slate-950/60 border border-slate-800/80 rounded-xl flex items-center justify-between text-xs text-slate-300 hover:border-slate-700 hover:text-white transition-colors">
+                            <span class="flex items-center gap-2.5">
+                                <svg class="w-4 h-4 text-indigo-400 fill-current" viewBox="0 0 24 24">
+                                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                                </svg>
+                                <span>github.com/usuario</span>
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Estatísticas de Perfil -->
+                <section class="bg-gradient-to-br from-indigo-900/40 via-slate-900/80 to-slate-900/80 border border-indigo-500/20 rounded-3xl p-6 shadow-xl shadow-slate-950/40 space-y-4">
+                    <h3 class="text-sm font-semibold text-indigo-300">Resumo da Conta</h3>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+                            <p class="text-2xl font-bold text-white">3</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Candidaturas</p>
+                        </div>
+                        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+                            <p class="text-2xl font-bold text-indigo-400">12</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Visualizações</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal de Confirmação de Logout -->
+    <div id="logoutModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl shadow-slate-950 transform scale-95 transition-transform duration-200" id="logoutModalCard">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-white">Deseja realmente sair?</h3>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Sua sessão atual será encerrada.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 mt-6">
+                <button type="button" onclick="closeLogoutModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-colors cursor-pointer">
+                    Cancelar
+                </button>
+                <a th:href="@{/}" class="px-5 py-2.5 bg-red-600 hover:bg-red-500 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-lg shadow-red-600/30 transition-all cursor-pointer inline-flex items-center gap-2">
+                    Sim, Sair
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            const card = document.getElementById('logoutModalCard');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+                card.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            const card = document.getElementById('logoutModalCard');
+            modal.classList.add('opacity-0');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Fechar ao pressionar Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLogoutModal();
+        });
+
+        // Fechar ao clicar no fundo escuro
+        document.getElementById('logoutModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeLogoutModal();
+        });
+    </script>
+</body>
+</html>

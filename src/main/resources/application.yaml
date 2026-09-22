@@ -1,3 +1,7 @@
 spring:
   application:
     name: gestao_vagas
+
+server:
+  port: 8081
+  
