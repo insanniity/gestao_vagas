@@ -36,15 +36,13 @@ public class Usuario extends Doc implements UserDetails{
     String nome;
     String senha;
     Boolean ativo;
-    String token;
-    LocalDateTime tokenExpiracao;
     LocalDateTime ultimoLogin;
     Permissao permissao;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + permissao.name()));
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + permissao.toString()));
         return authorities;
     }
 

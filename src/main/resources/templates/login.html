@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS v4 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script
+        src="https://code.jquery.com/jquery-4.0.0.min.js"
+        integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao="
+        crossorigin="anonymous"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -44,7 +48,7 @@
             </div>
 
             <!-- Formulário de Login -->
-            <form th:action="@{/login}" th:object="${loginRequest}" method="post" class="space-y-5">
+            <form th:action="@{/login}" method="post" class="space-y-5">
 
                 <!-- Campo Usuário / E-mail -->
                 <div>
@@ -60,7 +64,6 @@
                             id="username" 
                             name="username" 
                             required
-                            th:field="*{username}"
                             placeholder="seu.email@exemplo.com" 
                             class="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
                         >
@@ -84,7 +87,6 @@
                             id="password" 
                             name="password" 
                             required
-                            th:field="*{password}"
                             placeholder="••••••••" 
                             class="w-full pl-10 pr-10 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
                         >

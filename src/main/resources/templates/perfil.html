@@ -1,64 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/painel :: layout(~{::title}, 'perfil', ~{::#conteudo})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Perfil | Gestão de Vagas</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS v4 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100 relative overflow-x-hidden">
-    <!-- Efeitos de iluminação de fundo -->
-    <div class="fixed -top-40 -left-40 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="fixed top-1/2 -right-40 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
-
-    <!-- Barra de Navegação Superior -->
-    <header class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <!-- Logo / Brand -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-blue-500 rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                </div>
-                <span class="text-lg font-bold tracking-tight text-white">Gestão de Vagas</span>
-            </div>
-
-            <!-- Navegação Desktop -->
-            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-                <a href="#" class="hover:text-white transition-colors">Vagas Disponíveis</a>
-                <a href="#" class="hover:text-white transition-colors">Minhas Candidaturas</a>
-                <a href="#" class="text-indigo-400 font-semibold flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                    Meu Perfil
-                </a>
-            </nav>
-
-            <!-- Ações do Usuário -->
-            <div class="flex items-center gap-4">
-                <button type="button" onclick="openLogoutModal()" class="flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/30 px-3.5 py-1.5 rounded-xl bg-slate-900/60 transition-all cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Sair</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Conteúdo Principal -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8 relative z-10">
-
+<body>
+    <div id="conteudo" class="space-y-8">
         <!-- Banner / Cabeçalho do Perfil -->
         <section class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 relative overflow-hidden">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
@@ -67,7 +14,7 @@
                     <div class="relative group">
                         <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-blue-500 p-0.5 shadow-xl shadow-indigo-600/30">
                             <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-2xl sm:text-3xl font-bold text-indigo-400">
-                                <span th:text="${loginRequest != null and loginRequest.username != null ? #strings.substring(loginRequest.username, 0, 1).toUpperCase() : 'U'}">U</span>
+                                <span th:text="${usuario != null and usuario.nome != null ? #strings.substring(usuario.nome, 0, 1).toUpperCase() : (usuario != null and usuario.email != null ? #strings.substring(usuario.email, 0, 1).toUpperCase() : 'U')}">U</span>
                             </div>
                         </div>
                         <!-- Botão de alterar foto -->
@@ -83,8 +30,8 @@
                     <div class="space-y-1.5">
                         <div class="flex flex-wrap items-center gap-2.5">
                             <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight" 
-                                th:text="${loginRequest != null and loginRequest.username != null ? loginRequest.username : 'Usuário Conectado'}">
-                                usuario@exemplo.com
+                                th:text="${usuario != null and usuario.nome != null ? usuario.nome : (usuario != null ? usuario.email : 'Usuário Conectado')}">
+                                Gabriel Santos
                             </h1>
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -139,11 +86,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-slate-300 mb-1.5">Nome Completo</label>
-                                <input type="text" value="Gabriel Santos" class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" th:value="${usuario != null ? usuario.nome : 'Gabriel Santos'}" class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-300 mb-1.5">E-mail Profissional</label>
-                                <input type="email" th:value="${loginRequest != null and loginRequest.username != null ? loginRequest.username : 'teste@insannity.dev'}" class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="email" th:value="${usuario != null ? usuario.email : 'teste@insannity.dev'}" class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-300 mb-1.5">Telefone / WhatsApp</label>
@@ -298,66 +245,6 @@
 
         </div>
 
-    </main>
-
-    <!-- Modal de Confirmação de Logout -->
-    <div id="logoutModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl shadow-slate-950 transform scale-95 transition-transform duration-200" id="logoutModalCard">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-lg font-bold text-white">Deseja realmente sair?</h3>
-                    <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Sua sessão atual será encerrada.</p>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 mt-6">
-                <button type="button" onclick="closeLogoutModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition-colors cursor-pointer">
-                    Cancelar
-                </button>
-                <a th:href="@{/}" class="px-5 py-2.5 bg-red-600 hover:bg-red-500 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-lg shadow-red-600/30 transition-all cursor-pointer inline-flex items-center gap-2">
-                    Sim, Sair
-                </a>
-            </div>
-        </div>
     </div>
-
-    <script>
-        function openLogoutModal() {
-            const modal = document.getElementById('logoutModal');
-            const card = document.getElementById('logoutModalCard');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                card.classList.remove('scale-95');
-                card.classList.add('scale-100');
-            }, 10);
-        }
-
-        function closeLogoutModal() {
-            const modal = document.getElementById('logoutModal');
-            const card = document.getElementById('logoutModalCard');
-            modal.classList.add('opacity-0');
-            card.classList.remove('scale-100');
-            card.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
-        }
-
-        // Fechar ao pressionar Escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeLogoutModal();
-        });
-
-        // Fechar ao clicar no fundo escuro
-        document.getElementById('logoutModal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) closeLogoutModal();
-        });
-    </script>
 </body>
 </html>

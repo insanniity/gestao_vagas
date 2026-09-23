@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/painel :: layout(~{::title}, 'vagas', ~{::#conteudo})}">
+<head>
+    <title>Buscar Vagas | Gestão de Vagas</title>
+</head>
+<body>
+    <div id="conteudo" class="space-y-8">
+        
+        <!-- Banner de Boas-vindas e Campo de Busca -->
+        <section class="bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-indigo-950/40 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl shadow-slate-950/40 relative overflow-hidden">
+            <div class="max-w-3xl space-y-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                    Oportunidades em Tecnologia
+                </span>
+                <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                    Encontre a oportunidade perfeita para o seu perfil profissional
+                </h1>
+                <p class="text-sm sm:text-base text-slate-400">
+                    Explore vagas abertas para desenvolvedores Java, Spring Boot, arquitetos e engenheiros de software em empresas líderes de mercado.
+                </p>
+
+                <!-- Barra de Pesquisa com Filtro -->
+                <form th:action="@{/vagas}" method="get" class="pt-2">
+                    <div class="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-950/80 border border-slate-700/80 rounded-2xl p-1.5 sm:p-2 shadow-2xl focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent transition-all">
+                        <div class="relative flex-1 flex items-center">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="text" 
+                                name="q" 
+                                th:value="${query}" 
+                                placeholder="Busque por cargo, tecnologia (Java, Spring, MongoDB), empresa ou nível..." 
+                                class="w-full pl-10 pr-4 py-2.5 bg-transparent border-none text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-0"
+                            >
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a th:if="${query != null and !#strings.isEmpty(query)}" 
+                               th:href="@{/vagas}" 
+                               class="px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors">
+                                Limpar
+                            </a>
+                            <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <span>Buscar</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Barra de Status e Contagem de Resultados -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
+            <div class="text-slate-400">
+                <span>Exibindo </span>
+                <strong class="text-white font-semibold" th:text="${vagas != null ? vagas.size() : 0}">3</strong>
+                <span> vagas disponíveis</span>
+                <span th:if="${query != null and !#strings.isEmpty(query)}">
+                    para o termo <span class="text-indigo-400 font-medium" th:text="'&quot;' + ${query} + '&quot;'">"Java"</span>
+                </span>
+            </div>
+
+            <!-- Chips de Filtro Rápido -->
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs text-slate-500">Filtros rápidos:</span>
+                <a th:href="@{/vagas(q='JUNIOR')}" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white transition-colors">Júnior</a>
+                <a th:href="@{/vagas(q='PLENO')}" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white transition-colors">Pleno</a>
+                <a th:href="@{/vagas(q='SENIOR')}" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white transition-colors">Sênior</a>
+            </div>
+        </div>
+
+        <!-- Lista de Vagas -->
+        <div th:if="${vagas != null and !#lists.isEmpty(vagas)}" class="space-y-4">
+            
+            <!-- Card Individual de Vaga -->
+            <article th:each="vaga : ${vagas}" 
+                     class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-indigo-500/40 rounded-3xl p-6 sm:p-7 shadow-xl shadow-slate-950/40 transition-all duration-200 group relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+                
+                <div class="space-y-3 flex-1">
+                    <!-- Topo do Card: Empresa, Nível e Data -->
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            <span th:text="${vaga.empresa != null ? vaga.empresa : 'Empresa Confidencial'}">Java Jobs</span>
+                        </span>
+
+                        <!-- Badge de Nível / Senioridade -->
+                        <span th:if="${vaga.level == 'JUNIOR'}" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            Júnior
+                        </span>
+                        <span th:if="${vaga.level == 'PLENO'}" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            Pleno
+                        </span>
+                        <span th:if="${vaga.level == 'SENIOR'}" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                            Sênior
+                        </span>
+                        <span th:if="${vaga.level != 'JUNIOR' and vaga.level != 'PLENO' and vaga.level != 'SENIOR'}" 
+                              class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700" 
+                              th:text="${vaga.level}">
+                            Nível
+                        </span>
+
+                        <span class="text-xs text-slate-500">• Remoto</span>
+                    </div>
+
+                    <!-- Descrição da Vaga -->
+                    <h2 class="text-base sm:text-lg font-semibold text-white group-hover:text-indigo-300 transition-colors leading-snug"
+                        th:text="${vaga.descricao}">
+                        Vaga para Pessoa Desenvolvedora Java, que deseja trabalhar com Spring Boot 3.0 e microsserviços.
+                    </h2>
+
+                    <!-- Benefícios -->
+                    <div class="flex items-start gap-2 pt-1 text-xs text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="leading-relaxed">
+                            <strong class="text-slate-300">Benefícios: </strong>
+                            <span th:text="${vaga.beneficios != null ? vaga.beneficios : 'Não informados'}">Gympass, Plano de Saúde, Vale Alimentação e Refeição</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Botão de Ação: Candidatar-se -->
+                <div class="flex items-center md:flex-col justify-end gap-2 shrink-0">
+                    <button type="button" 
+                            th:onclick="'candidatarVaga(\'' + ${vaga.id} + '\')'"
+                            class="w-full md:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/25 transition-all cursor-pointer flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                        <span>Candidatar-se</span>
+                    </button>
+                </div>
+
+            </article>
+
+        </div>
+
+        <!-- Estado Vazio (Nenhuma vaga encontrada) -->
+        <div th:if="${vagas == null or #lists.isEmpty(vagas)}" 
+             class="bg-slate-900/60 border border-slate-800 rounded-3xl p-12 text-center space-y-4 max-w-xl mx-auto">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-lg font-bold text-white">Nenhuma vaga encontrada</h3>
+                <p class="text-xs sm:text-sm text-slate-400">
+                    Não encontramos nenhuma vaga correspondente ao filtro aplicado. Tente buscar por outros termos ou remover a pesquisa.
+                </p>
+            </div>
+            <div class="pt-2">
+                <a th:href="@{/vagas}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-colors">
+                    Ver todas as vagas
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script de Feedback de Candidatura usando jQuery -->
+    <script th:inline="javascript">
+        function candidatarVaga(vagaId) {
+            alert('Candidatura enviada com sucesso para a vaga selecionada!');
+        }
+    </script>
+</body>
+</html>

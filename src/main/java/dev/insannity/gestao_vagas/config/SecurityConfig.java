@@ -14,19 +14,20 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/img/**")
-                        .permitAll()
-                        .requestMatchers("/admin/**")
-                        .hasRole("ADMIN")
-                        .anyRequest()
-                        .authenticated())
+                        .requestMatchers("/login", "/css/**", "/js/**", "/img/**").permitAll()
+                        .anyRequest().authenticated())
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .defaultSuccessUrl("/painel")
+                        .defaultSuccessUrl("/vagas")
                         .permitAll())
+                .sessionManagement(session -> session
+                        .maximumSessions(1)
+                )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login")
                         .permitAll());
+                        
         return http.build();
     }
 }

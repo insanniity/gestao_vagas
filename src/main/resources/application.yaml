@@ -1,6 +1,9 @@
 spring:
   application:
     name: gestao_vagas
+  mongodb:
+    database: gestao_vagas
+    uri: mongodb://localhost:27017
 
 server:
   port: 8081
