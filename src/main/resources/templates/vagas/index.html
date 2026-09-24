@@ -7,6 +7,24 @@
 <body>
     <div id="conteudo" class="space-y-8">
         
+        <!-- Feedback de Sucesso (Flash Message) -->
+        <div th:if="${sucesso != null}" 
+             class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-2xl p-4 flex items-center justify-between shadow-lg shadow-emerald-950/20 animate-fade-in">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <span class="text-xs sm:text-sm font-medium" th:text="${sucesso}">Vaga cadastrada com sucesso!</span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-400/60 hover:text-emerald-300 p-1 cursor-pointer transition-colors" title="Fechar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
         <!-- Banner de Boas-vindas e Campo de Busca -->
         <section class="bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-indigo-950/40 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl shadow-slate-950/40 relative overflow-hidden">
             <div class="max-w-3xl space-y-4">
@@ -57,22 +75,34 @@
         </section>
 
         <!-- Barra de Status e Contagem de Resultados -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm">
             <div class="text-slate-400">
                 <span>Exibindo </span>
-                <strong class="text-white font-semibold" th:text="${vagas != null ? vagas.size() : 0}">3</strong>
+                <strong class="text-white font-semibold" th:text="${vagas != null ? vagas.size() : 0}">10</strong>
+                <span th:if="${vagasPage != null}">
+                    de <strong class="text-white font-semibold" th:text="${vagasPage.totalElements}">20</strong>
+                </span>
                 <span> vagas disponíveis</span>
                 <span th:if="${query != null and !#strings.isEmpty(query)}">
-                    para o termo <span class="text-indigo-400 font-medium" th:text="'&quot;' + ${query} + '&quot;'">"Java"</span>
+                    para o termo &ldquo;<span class="text-indigo-400 font-medium" th:text="${query}">Java</span>&rdquo;
                 </span>
             </div>
 
-            <!-- Chips de Filtro Rápido -->
-            <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs text-slate-500">Filtros rápidos:</span>
-                <a th:href="@{/vagas(q='JUNIOR')}" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white transition-colors">Júnior</a>
-                <a th:href="@{/vagas(q='PLENO')}" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white transition-colors">Pleno</a>
-                <a th:href="@{/vagas(q='SENIOR')}" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white transition-colors">Sênior</a>
+            <!-- Chips de Filtro Rápido e Botão Cadastrar Vaga -->
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-xs text-slate-500">Filtros:</span>
+                    <a th:href="@{/vagas(q='JUNIOR')}" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white transition-colors">Júnior</a>
+                    <a th:href="@{/vagas(q='PLENO')}" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white transition-colors">Pleno</a>
+                    <a th:href="@{/vagas(q='SENIOR')}" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white transition-colors">Sênior</a>
+                </div>
+
+                <a th:href="@{/vagas/nova}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-semibold rounded-xl shadow-md shadow-indigo-600/25 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Cadastrar Vaga</span>
+                </a>
             </div>
         </div>
 
@@ -110,11 +140,13 @@
                         <span class="text-xs text-slate-500">• Remoto</span>
                     </div>
 
-                    <!-- Descrição da Vaga -->
-                    <h2 class="text-base sm:text-lg font-semibold text-white group-hover:text-indigo-300 transition-colors leading-snug"
-                        th:text="${vaga.descricao}">
-                        Vaga para Pessoa Desenvolvedora Java, que deseja trabalhar com Spring Boot 3.0 e microsserviços.
-                    </h2>
+                    <!-- Descrição da Vaga com Link para Detalhes -->
+                    <a th:href="@{/vagas/{id}(id=${vaga.id})}" class="block group/link">
+                        <h2 class="text-base sm:text-lg font-semibold text-white group-hover/link:text-indigo-300 transition-colors leading-snug"
+                            th:text="${vaga.descricao}">
+                            Vaga para Pessoa Desenvolvedora Java, que deseja trabalhar com Spring Boot 3.0 e microsserviços.
+                        </h2>
+                    </a>
 
                     <!-- Benefícios -->
                     <div class="flex items-start gap-2 pt-1 text-xs text-slate-400">
@@ -128,21 +160,121 @@
                     </div>
                 </div>
 
-                <!-- Botão de Ação: Candidatar-se -->
-                <div class="flex items-center md:flex-col justify-end gap-2 shrink-0">
+                <!-- Ações da Vaga -->
+                <div class="flex items-center md:flex-col justify-end gap-2.5 shrink-0">
                     <button type="button" 
-                            th:onclick="'candidatarVaga(\'' + ${vaga.id} + '\')'"
+                            th:data-vaga-id="${vaga.id}"
+                            onclick="candidatarVaga(this.dataset.vagaId)"
                             class="w-full md:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/25 transition-all cursor-pointer flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                         <span>Candidatar-se</span>
                     </button>
+
+                    <div class="flex items-center gap-1.5 w-full justify-end">
+                        <a th:href="@{/vagas/{id}(id=${vaga.id})}" 
+                           title="Ver detalhes da vaga"
+                           class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </a>
+                        <a th:href="@{/vagas/{id}/editar(id=${vaga.id})}" 
+                           title="Editar vaga"
+                           class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 transition-colors flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </a>
+                        <button type="button"
+                                th:data-vaga-id="${vaga.id}"
+                                th:data-vaga-empresa="${vaga.empresa}"
+                                onclick="confirmarExclusaoModal(this.dataset.vagaId, this.dataset.vagaEmpresa)"
+                                title="Apagar vaga"
+                                class="p-2 rounded-xl bg-slate-800/80 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
             </article>
 
         </div>
+
+        <!-- Controles de Paginação -->
+        <nav th:if="${vagasPage != null and vagasPage.totalPages > 1}" 
+             aria-label="Navegação de páginas"
+             class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl shadow-slate-950/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <div class="text-xs sm:text-sm text-slate-400">
+                <span>Página </span>
+                <strong class="text-white font-semibold" th:text="${vagasPage.number + 1}">1</strong>
+                <span> de </span>
+                <strong class="text-white font-semibold" th:text="${vagasPage.totalPages}">2</strong>
+                <span class="text-slate-500">•</span>
+                <span>Total de </span>
+                <strong class="text-indigo-400 font-semibold" th:text="${vagasPage.totalElements}">20</strong>
+                <span> vagas</span>
+            </div>
+
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <!-- Botão Anterior -->
+                <a th:if="${vagasPage.hasPrevious()}" 
+                   th:href="@{/vagas(page=${vagasPage.number - 1}, q=${query})}" 
+                   class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span class="hidden sm:inline">Anterior</span>
+                </a>
+                <span th:unless="${vagasPage.hasPrevious()}" 
+                      class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-600 text-xs sm:text-sm font-semibold flex items-center gap-1.5 cursor-not-allowed opacity-50 select-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span class="hidden sm:inline">Anterior</span>
+                </span>
+
+                <!-- Números das Páginas -->
+                <div class="flex items-center gap-1">
+                    <th:block th:each="pageNum : ${#numbers.sequence(0, vagasPage.totalPages - 1)}">
+                        <a th:if="${pageNum != vagasPage.number}"
+                           th:href="@{/vagas(page=${pageNum}, q=${query})}"
+                           th:text="${pageNum + 1}"
+                           class="w-9 h-9 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center cursor-pointer">
+                            1
+                        </a>
+                        <span th:if="${pageNum == vagasPage.number}"
+                              th:text="${pageNum + 1}"
+                              class="w-9 h-9 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs sm:text-sm font-bold shadow-md shadow-indigo-600/30 flex items-center justify-center select-none">
+                            1
+                        </span>
+                    </th:block>
+                </div>
+
+                <!-- Botão Próximo -->
+                <a th:if="${vagasPage.hasNext()}" 
+                   th:href="@{/vagas(page=${vagasPage.number + 1}, q=${query})}" 
+                   class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <span class="hidden sm:inline">Próximo</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+                <span th:unless="${vagasPage.hasNext()}" 
+                      class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-600 text-xs sm:text-sm font-semibold flex items-center gap-1.5 cursor-not-allowed opacity-50 select-none">
+                    <span class="hidden sm:inline">Próximo</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </span>
+            </div>
+
+        </nav>
 
         <!-- Estado Vazio (Nenhuma vaga encontrada) -->
         <div th:if="${vagas == null or #lists.isEmpty(vagas)}" 
@@ -165,13 +297,78 @@
             </div>
         </div>
 
-    </div>
+        <!-- Modal de Confirmação de Exclusão -->
+        <div id="modalExclusao" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl shadow-slate-950 transform scale-95 transition-transform duration-200" id="modalExclusaoCard">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Deseja apagar esta vaga?</h3>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">A oportunidade não será mais exibida para os candidatos.</p>
+                    </div>
+                </div>
 
-    <!-- Script de Feedback de Candidatura usando jQuery -->
-    <script th:inline="javascript">
-        function candidatarVaga(vagaId) {
-            alert('Candidatura enviada com sucesso para a vaga selecionada!');
-        }
-    </script>
+                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-xs text-slate-300">
+                    <p><strong>Empresa: </strong><span id="modalEmpresaNome">Empresa</span></p>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 mt-6">
+                    <button type="button" 
+                            onclick="fecharModalExclusao()" 
+                            class="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs sm:text-sm font-medium transition-colors cursor-pointer">
+                        Cancelar
+                    </button>
+                    
+                    <form id="formExcluirVaga" method="post" th:action="@{/vagas}" class="inline">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" 
+                                class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs sm:text-sm font-semibold transition-colors shadow-lg shadow-red-600/30 cursor-pointer flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7" />
+                            </svg>
+                            <span>Sim, Apagar Vaga</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts de Interação -->
+        <script th:inline="javascript">
+            function candidatarVaga(vagaId) {
+                alert('Candidatura enviada com sucesso para a vaga selecionada!');
+            }
+
+            function confirmarExclusaoModal(vagaId, empresa) {
+                const modal = document.getElementById('modalExclusao');
+                const card = document.getElementById('modalExclusaoCard');
+                const form = document.getElementById('formExcluirVaga');
+                const empresaSpan = document.getElementById('modalEmpresaNome');
+
+                form.action = '/vagas/' + encodeURIComponent(vagaId) + '/apagar';
+                empresaSpan.textContent = empresa || 'Não informada';
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    card.classList.remove('scale-95');
+                }, 10);
+            }
+
+            function fecharModalExclusao() {
+                const modal = document.getElementById('modalExclusao');
+                const card = document.getElementById('modalExclusaoCard');
+                modal.classList.add('opacity-0');
+                card.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 200);
+            }
+        </script>
+    </div>
 </body>
 </html>

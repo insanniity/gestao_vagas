@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/painel :: layout(~{::title}, 'vagas', ~{::#conteudo})}">
+<head>
+    <title>Editar Vaga | Gestão de Vagas</title>
+</head>
+<body>
+    <div id="conteudo" class="space-y-8 max-w-5xl mx-auto">
+        
+        <!-- Breadcrumb e Cabeçalho -->
+        <div class="space-y-2">
+            <nav class="flex items-center gap-2 text-xs text-slate-400">
+                <a th:href="@{/vagas}" class="hover:text-indigo-400 transition-colors">Vagas</a>
+                <span>/</span>
+                <a th:href="@{/vagas/{id}(id=${vagaId})}" class="hover:text-indigo-400 transition-colors">Detalhes</a>
+                <span>/</span>
+                <span class="text-slate-200 font-medium">Editar Vaga</span>
+            </nav>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Editar Oportunidade
+                    </h1>
+                    <p class="text-sm text-slate-400 mt-1">
+                        Atualize os dados e requisitos desta vaga para manter as informações alinhadas aos candidatos.
+                    </p>
+                </div>
+                <a th:href="@{/vagas/{id}(id=${vagaId})}" 
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800 text-slate-300 hover:text-white text-xs sm:text-sm font-medium transition-all w-fit">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Voltar para detalhes</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Mensagem de Erro Geral se houver pendências -->
+        <div th:if="${#fields.hasErrors('${vagaRequest.*}')}" 
+             class="bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl p-4 flex items-start gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div class="text-xs sm:text-sm">
+                <span class="font-bold">Atenção:</span> Existem campos incorretos ou não preenchidos no formulário. Por favor, revise as informações destacadas abaixo.
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Coluna do Formulário de Edição -->
+            <div class="lg:col-span-2">
+                <form th:action="@{/vagas/{id}/editar(id=${vagaId})}" th:object="${vagaRequest}" method="post" class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 space-y-6">
+                    
+                    <!-- Campo Empresa -->
+                    <div class="space-y-1.5">
+                        <label for="empresa" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            Nome da Empresa <span class="text-red-400">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                            </div>
+                            <input type="text" 
+                                   id="empresa" 
+                                   th:field="*{empresa}"
+                                   placeholder="Ex: TechCorp Solutions, Nubank, Insannity Dev..." 
+                                   class="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                   th:classappend="${#fields.hasErrors('empresa')} ? 'border-red-500/80 focus:ring-red-500' : 'border-slate-700/80'">
+                        </div>
+                        <p th:if="${#fields.hasErrors('empresa')}" th:errors="*{empresa}" class="text-xs text-red-400 pt-0.5 flex items-center gap-1">
+                            Mensagem de erro
+                        </p>
+                    </div>
+
+                    <!-- Campo Nível de Experiência -->
+                    <div class="space-y-1.5">
+                        <label for="level" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            Nível de Experiência / Senioridade <span class="text-red-400">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <select id="level" 
+                                    th:field="*{level}" 
+                                    class="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all cursor-pointer"
+                                    th:classappend="${#fields.hasErrors('level')} ? 'border-red-500/80 focus:ring-red-500' : 'border-slate-700/80'">
+                                <option value="" class="bg-slate-900 text-slate-400">Selecione a senioridade...</option>
+                                <option th:each="lvl : ${niveis}" 
+                                        th:value="${lvl}" 
+                                        th:text="${lvl == 'ESTAGIO' ? 'Estágio' : (lvl == 'JUNIOR' ? 'Júnior' : (lvl == 'PLENO' ? 'Pleno' : (lvl == 'SENIOR' ? 'Sênior' : 'Especialista')))}"
+                                        class="bg-slate-900 text-slate-100">
+                                    Júnior
+                                </option>
+                            </select>
+                        </div>
+                        <p th:if="${#fields.hasErrors('level')}" th:errors="*{level}" class="text-xs text-red-400 pt-0.5 flex items-center gap-1">
+                            Mensagem de erro
+                        </p>
+                    </div>
+
+                    <!-- Campo Descrição / Requisitos -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <label for="descricao" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                                Descrição e Requisitos da Vaga <span class="text-red-400">*</span>
+                            </label>
+                            <span class="text-xs text-slate-500">Mínimo 10 caracteres</span>
+                        </div>
+                        <div class="relative">
+                            <textarea id="descricao" 
+                                      th:field="*{descricao}" 
+                                      rows="5"
+                                      placeholder="Descreva as principais atribuições e requisitos técnicos..."
+                                      class="w-full p-4 bg-slate-950/60 border rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                      th:classappend="${#fields.hasErrors('descricao')} ? 'border-red-500/80 focus:ring-red-500' : 'border-slate-700/80'"></textarea>
+                        </div>
+                        <p th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}" class="text-xs text-red-400 pt-0.5 flex items-center gap-1">
+                            Mensagem de erro
+                        </p>
+                    </div>
+
+                    <!-- Campo Benefícios -->
+                    <div class="space-y-1.5">
+                        <label for="beneficios" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            Benefícios Oferecidos <span class="text-red-400">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V4a2 2 0 10-2 2h2zm0 13c1.657 0 3-1.343 3-3s-1.343-3-3-3m0 6c-1.657 0-3-1.343-3-3s1.343-3 3-3" />
+                                </svg>
+                            </div>
+                            <input type="text" 
+                                   id="beneficios" 
+                                   th:field="*{beneficios}"
+                                   placeholder="Ex: Gympass, Plano de Saúde, Day-off, VR/VA..." 
+                                   class="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                   th:classappend="${#fields.hasErrors('beneficios')} ? 'border-red-500/80 focus:ring-red-500' : 'border-slate-700/80'">
+                        </div>
+                        <p th:if="${#fields.hasErrors('beneficios')}" th:errors="*{beneficios}" class="text-xs text-red-400 pt-0.5 flex items-center gap-1">
+                            Mensagem de erro
+                        </p>
+                    </div>
+
+                    <!-- Barra de Ações -->
+                    <div class="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+                        <a th:href="@{/vagas/{id}(id=${vagaId})}" 
+                           class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer">
+                            Cancelar
+                        </a>
+                        <button type="submit" 
+                                class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Salvar Alterações</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Coluna Lateral de Apoio -->
+            <div class="space-y-6">
+                <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 shadow-xl shadow-slate-950/40 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-sm font-bold text-white">Edição em Tempo Real</h3>
+                    </div>
+                    
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Ao salvar as alterações, a data de atualização do documento será registrada automaticamente no sistema, mantendo o histórico de revisões.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+</html>
