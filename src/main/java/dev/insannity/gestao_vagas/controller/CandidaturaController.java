@@ -3,6 +3,7 @@ package dev.insannity.gestao_vagas.controller;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ public class CandidaturaController {
     private final CandidaturaService candidaturaService;
 
     @GetMapping
+    @PreAuthorize("hasRole('CANDIDATO')")
     public String minhasCandidaturas(Model model, Principal principal) {
         List<Candidatura> candidaturas = candidaturaService.listarMinhasCandidaturas(principal.getName());
         model.addAttribute("candidaturas", candidaturas);
@@ -32,6 +34,7 @@ public class CandidaturaController {
     }
 
     @PostMapping("/vaga/{vagaId}")
+    @PreAuthorize("hasRole('CANDIDATO')")
     public String candidatar(
             @PathVariable String vagaId,
             Principal principal,
@@ -43,6 +46,7 @@ public class CandidaturaController {
     }
 
     @PostMapping("/{id}/cancelar")
+    @PreAuthorize("hasRole('CANDIDATO')")
     public String cancelar(
             @PathVariable String id,
             Principal principal,
@@ -54,6 +58,7 @@ public class CandidaturaController {
     }
 
     @PostMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTADOR')")
     public String atualizarStatus(
             @PathVariable String id,
             @RequestParam("status") StatusCandidatura status,
@@ -62,6 +67,18 @@ public class CandidaturaController {
 
         candidaturaService.atualizarStatus(id, status);
         redirectAttributes.addFlashAttribute("sucesso", "Status do candidato atualizado para " + status.getDescricao() + "!");
+        return "redirect:/vagas/" + vagaId;
+    }
+
+    @PostMapping("/atribuir")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String atribuir(
+            @RequestParam("usuarioId") String usuarioId,
+            @RequestParam("vagaId") String vagaId,
+            RedirectAttributes redirectAttributes) {
+
+        candidaturaService.atribuirCandidatoAVaga(usuarioId, vagaId);
+        redirectAttributes.addFlashAttribute("sucesso", "Candidato vinculado à vaga com sucesso!");
         return "redirect:/vagas/" + vagaId;
     }
 

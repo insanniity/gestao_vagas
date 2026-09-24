@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import dev.insannity.gestao_vagas.docs.Usuario;
+import dev.insannity.gestao_vagas.enums.Permissao;
 import dev.insannity.gestao_vagas.exceptions.RecursoNaoEncontradoException;
 import dev.insannity.gestao_vagas.payloads.PerfilRequest;
 import dev.insannity.gestao_vagas.repositories.UsuarioRepository;
@@ -31,7 +32,7 @@ public class UsuarioService {
         if (query != null && !query.trim().isEmpty()) {
             return usuarioRepository.findCandidatosDisponiveis(query.trim());
         }
-        return usuarioRepository.findByDisponivelParaContratacaoTrueAndDeletadoIsNullOrderByNomeAsc();
+        return usuarioRepository.findByPermissaoAndDisponivelParaContratacaoTrueAndDeletadoIsNullOrderByNomeAsc(Permissao.CANDIDATO);
     }
 
     public Usuario atualizarPerfil(String email, PerfilRequest request) {
@@ -42,13 +43,23 @@ public class UsuarioService {
         usuario.setLocalizacao(request.getLocalizacao() != null ? request.getLocalizacao().trim() : null);
         usuario.setCargo(request.getCargo() != null ? request.getCargo().trim() : null);
         usuario.setResumo(request.getResumo() != null ? request.getResumo().trim() : null);
-        usuario.setDisponivelParaContratacao(request.getDisponivelParaContratacao() != null ? request.getDisponivelParaContratacao() : true);
+        
+        if (usuario.getPermissao() == Permissao.CANDIDATO) {
+            usuario.setDisponivelParaContratacao(request.getDisponivelParaContratacao() != null ? request.getDisponivelParaContratacao() : true);
+        } else {
+            usuario.setDisponivelParaContratacao(false);
+        }
+
         usuario.setCompetencias(request.obterListaCompetencias());
         usuario.setLinkedin(request.getLinkedin() != null ? request.getLinkedin().trim() : null);
         usuario.setGithub(request.getGithub() != null ? request.getGithub().trim() : null);
         usuario.setAtualizado(LocalDateTime.now());
 
         return usuarioRepository.save(usuario);
+    }
+
+    public List<Usuario> listarTodosCandidatos() {
+        return usuarioRepository.findByPermissaoAndDeletadoIsNullOrderByNomeAsc(Permissao.CANDIDATO);
     }
 
 }

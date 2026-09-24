@@ -7,14 +7,17 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import dev.insannity.gestao_vagas.docs.Usuario;
+import dev.insannity.gestao_vagas.enums.Permissao;
 
 public interface UsuarioRepository extends MongoRepository<Usuario, String> {
 
     Optional<Usuario> findByEmail(String email);
 
-    List<Usuario> findByDisponivelParaContratacaoTrueAndDeletadoIsNullOrderByNomeAsc();
+    List<Usuario> findByPermissaoAndDisponivelParaContratacaoTrueAndDeletadoIsNullOrderByNomeAsc(Permissao permissao);
 
-    @Query("{ 'disponivelParaContratacao': true, 'deletado': null, $or: [ { 'nome': { $regex: ?0, $options: 'i' } }, { 'cargo': { $regex: ?0, $options: 'i' } }, { 'localizacao': { $regex: ?0, $options: 'i' } }, { 'competencias': { $regex: ?0, $options: 'i' } } ] }")
+    List<Usuario> findByPermissaoAndDeletadoIsNullOrderByNomeAsc(Permissao permissao);
+
+    @Query("{ 'permissao': 'CANDIDATO', 'disponivelParaContratacao': true, 'deletado': null, $or: [ { 'nome': { $regex: ?0, $options: 'i' } }, { 'cargo': { $regex: ?0, $options: 'i' } }, { 'localizacao': { $regex: ?0, $options: 'i' } }, { 'competencias': { $regex: ?0, $options: 'i' } } ] }")
     List<Usuario> findCandidatosDisponiveis(String termo);
 
 }

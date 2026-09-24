@@ -65,6 +65,7 @@ public class VagasController {
     }
 
     @GetMapping("/nova")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'RECRUTADOR')")
     public String formCadastro(Model model) {
         if (!model.containsAttribute("vagaRequest")) {
             model.addAttribute("vagaRequest", new VagaRequest());
@@ -73,6 +74,7 @@ public class VagasController {
     }
 
     @PostMapping("/nova")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'RECRUTADOR')")
     public String cadastrar(
             @Valid @ModelAttribute("vagaRequest") VagaRequest vagaRequest,
             BindingResult bindingResult,
@@ -92,12 +94,14 @@ public class VagasController {
         Vaga vaga = vagaService.buscarPorId(id);
         model.addAttribute("vaga", vaga);
 
-        List<dev.insannity.gestao_vagas.docs.Candidatura> candidaturas = candidaturaService.listarCandidatosDaVaga(id);
-        model.addAttribute("candidaturas", candidaturas);
-        model.addAttribute("todosStatus", dev.insannity.gestao_vagas.enums.StatusCandidatura.values());
+        boolean podeVerCandidatos = false;
+        boolean isAdmin = false;
 
         if (principal != null) {
             Usuario usuario = usuarioService.buscarPorEmail(principal.getName());
+            isAdmin = usuario.getPermissao() == dev.insannity.gestao_vagas.enums.Permissao.ADMIN;
+            podeVerCandidatos = isAdmin || usuario.getPermissao() == dev.insannity.gestao_vagas.enums.Permissao.RECRUTADOR;
+
             java.util.Optional<dev.insannity.gestao_vagas.docs.Candidatura> minhaCandidatura = candidaturaService.obterCandidatura(usuario.getId(), id);
             model.addAttribute("jaCandidatado", minhaCandidatura.isPresent());
             model.addAttribute("minhaCandidatura", minhaCandidatura.orElse(null));
@@ -106,10 +110,23 @@ public class VagasController {
             model.addAttribute("minhaCandidatura", null);
         }
 
+        if (podeVerCandidatos) {
+            List<dev.insannity.gestao_vagas.docs.Candidatura> candidaturas = candidaturaService.listarCandidatosDaVaga(id);
+            model.addAttribute("candidaturas", candidaturas);
+            model.addAttribute("todosStatus", dev.insannity.gestao_vagas.enums.StatusCandidatura.values());
+        } else {
+            model.addAttribute("candidaturas", java.util.Collections.emptyList());
+        }
+
+        if (isAdmin) {
+            model.addAttribute("todosCandidatos", usuarioService.listarTodosCandidatos());
+        }
+
         return "vagas/detalhes";
     }
 
     @GetMapping("/{id}/editar")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'RECRUTADOR')")
     public String formEdicao(@PathVariable String id, Model model) {
         Vaga vaga = vagaService.buscarPorId(id);
         if (!model.containsAttribute("vagaRequest")) {
@@ -120,6 +137,7 @@ public class VagasController {
     }
 
     @PostMapping("/{id}/editar")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'RECRUTADOR')")
     public String atualizar(
             @PathVariable String id,
             @Valid @ModelAttribute("vagaRequest") VagaRequest vagaRequest,
@@ -138,6 +156,7 @@ public class VagasController {
     }
 
     @PostMapping("/{id}/apagar")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'RECRUTADOR')")
     public String apagar(@PathVariable String id, RedirectAttributes redirectAttributes) {
         vagaService.apagar(id);
         redirectAttributes.addFlashAttribute("sucesso", "Vaga excluída com sucesso!");

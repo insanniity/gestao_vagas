@@ -43,7 +43,7 @@ public class InitDB implements ApplicationRunner {
             .localizacao("São Paulo, SP (Remoto)")
             .telefone("(11) 98765-4321")
             .resumo("Desenvolvedor de software sênior com vasta experiência no ecossistema Spring Boot, MongoDB e arquiteturas de alta escalabilidade. Entusiasta de Clean Code, boas práticas e liderança técnica.")
-            .disponivelParaContratacao(true)
+            .disponivelParaContratacao(false)
             .competencias(List.of("Java 21", "Spring Boot", "MongoDB", "RESTful APIs", "Docker", "Tailwind CSS", "Microsserviços", "Git & GitHub"))
             .linkedin("https://linkedin.com/in/insannity")
             .github("https://github.com/insannity")
@@ -84,8 +84,24 @@ public class InitDB implements ApplicationRunner {
             .build();
         cand2 = usuarioRepository.save(cand2);
 
-        log.info("Usuários criados com sucesso: admin, mariana, lucas.");
-        log.info("Usuário inicial criado: {}", usuario.getEmail());
+        Usuario recrutador = Usuario.builder()
+            .nome("Carla Recrutadora")
+            .ativo(true)
+            .email("recrutador@insannity.dev")
+            .permissao(Permissao.RECRUTADOR)
+            .senha(passwordEncoder.encode("recrutador123"))
+            .cargo("Tech Recruiter & HR Business Partner")
+            .localizacao("São Paulo, SP (Híbrido)")
+            .telefone("(11) 97777-5544")
+            .resumo("Especialista em atração e seleção de talentos de tecnologia, engenharia de software e liderança técnica.")
+            .disponivelParaContratacao(false)
+            .competencias(List.of("Tech Sourcing", "Talent Acquisition", "Entrevista por Competências", "Gestão de Vagas"))
+            .linkedin("https://linkedin.com/in/carla-recrutadora")
+            .github("https://github.com/carla-recruiter")
+            .build();
+        recrutador = usuarioRepository.save(recrutador);
+
+        log.info("Usuários criados com sucesso: admin, mariana, lucas, recrutador.");
 
         vagaRepository.deleteAll();
         List<Vaga> vagas = List.of(
@@ -220,13 +236,13 @@ public class InitDB implements ApplicationRunner {
 
             List<Candidatura> candidaturasIniciais = List.of(
                 Candidatura.builder()
-                    .usuarioId(usuario.getId())
-                    .usuarioNome(usuario.getNome())
-                    .usuarioEmail(usuario.getEmail())
-                    .usuarioTelefone(usuario.getTelefone())
-                    .usuarioCargo(usuario.getCargo())
-                    .usuarioLinkedin(usuario.getLinkedin())
-                    .usuarioGithub(usuario.getGithub())
+                    .usuarioId(cand1.getId())
+                    .usuarioNome(cand1.getNome())
+                    .usuarioEmail(cand1.getEmail())
+                    .usuarioTelefone(cand1.getTelefone())
+                    .usuarioCargo(cand1.getCargo())
+                    .usuarioLinkedin(cand1.getLinkedin())
+                    .usuarioGithub(cand1.getGithub())
                     .vagaId(v1.getId())
                     .vagaEmpresa(v1.getEmpresa())
                     .vagaDescricao(v1.getDescricao())

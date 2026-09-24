@@ -92,4 +92,32 @@ public class CandidaturaService {
         return candidaturaRepository.countByUsuarioIdAndDeletadoIsNull(usuarioId);
     }
 
+    public Candidatura atribuirCandidatoAVaga(String usuarioId, String vagaId) {
+        Usuario usuario = usuarioService.buscarPorId(usuarioId);
+        Vaga vaga = vagaService.buscarPorId(vagaId);
+
+        Optional<Candidatura> existente = candidaturaRepository.findByUsuarioIdAndVagaIdAndDeletadoIsNull(usuario.getId(), vagaId);
+        if (existente.isPresent()) {
+            return existente.get();
+        }
+
+        Candidatura candidatura = Candidatura.builder()
+                .usuarioId(usuario.getId())
+                .usuarioNome(usuario.getNome() != null ? usuario.getNome() : usuario.getEmail())
+                .usuarioEmail(usuario.getEmail())
+                .usuarioTelefone(usuario.getTelefone())
+                .usuarioCargo(usuario.getCargo())
+                .usuarioLinkedin(usuario.getLinkedin())
+                .usuarioGithub(usuario.getGithub())
+                .vagaId(vaga.getId())
+                .vagaEmpresa(vaga.getEmpresa())
+                .vagaDescricao(vaga.getDescricao())
+                .vagaLevel(vaga.getLevel())
+                .status(StatusCandidatura.RECEBIDA)
+                .dataCandidatura(LocalDateTime.now())
+                .build();
+
+        return candidaturaRepository.save(candidatura);
+    }
+
 }

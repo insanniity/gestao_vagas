@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layout/painel :: layout(~{::title}, 'perfil', ~{::#conteudo})}">
 <head>
     <title>Meu Perfil | Gestão de Vagas</title>
@@ -46,16 +46,28 @@
                                 Nome do Usuário
                             </h1>
 
-                            <!-- Badge de Disponibilidade -->
-                            <span th:if="${usuario != null and usuario.disponivelParaContratacao != false}" 
-                                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                Disponível para contratação
+                            <!-- Badge de Papel para Admin / Recrutador -->
+                            <span th:if="${usuario != null and usuario.permissao != null and usuario.permissao.name() == 'ADMIN'}" 
+                                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                                Administrador
                             </span>
-                            <span th:if="${usuario != null and usuario.disponivelParaContratacao == false}" 
-                                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-400 border border-slate-700">
-                                Indisponível no momento
+                            <span th:if="${usuario != null and usuario.permissao != null and usuario.permissao.name() == 'RECRUTADOR'}" 
+                                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                                Recrutador
                             </span>
+
+                            <!-- Badge de Disponibilidade para Candidato -->
+                            <th:block th:if="${usuario == null or usuario.permissao == null or usuario.permissao.name() == 'CANDIDATO'}">
+                                <span th:if="${usuario != null and usuario.disponivelParaContratacao != false}" 
+                                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    Disponível para contratação
+                                </span>
+                                <span th:if="${usuario != null and usuario.disponivelParaContratacao == false}" 
+                                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                                    Indisponível no momento
+                                </span>
+                            </th:block>
                         </div>
                         <p class="text-sm text-slate-400 flex items-center gap-2">
                             <span th:text="${usuario != null and usuario.cargo != null and !#strings.isEmpty(usuario.cargo) ? usuario.cargo : 'Desenvolvedor(a)'}">Desenvolvedor(a)</span>
@@ -203,8 +215,8 @@
                             </div>
                         </div>
 
-                        <!-- Checkbox Disponível para Contratação -->
-                        <div class="pt-2 flex items-center gap-3">
+                        <!-- Checkbox Disponível para Contratação (Apenas para Candidato) -->
+                        <div sec:authorize="hasRole('CANDIDATO')" class="pt-2 flex items-center gap-3">
                             <input type="checkbox" 
                                    id="disponivelParaContratacao" 
                                    th:field="*{disponivelParaContratacao}" 
@@ -226,8 +238,8 @@
                     </form>
                 </section>
 
-                <!-- Candidaturas Recentes -->
-                <section class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 space-y-6">
+                <!-- Candidaturas Recentes (Apenas CANDIDATO) -->
+                <section sec:authorize="hasRole('CANDIDATO')" class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 space-y-6">
                     <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                         <h2 class="text-lg font-semibold text-white flex items-center gap-2.5">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

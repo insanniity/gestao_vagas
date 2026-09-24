@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layout/painel :: layout(~{::title}, 'vagas', ~{::#conteudo})}">
 <head>
     <title th:text="${vaga != null ? vaga.empresa + ' - Detalhes da Vaga' : 'Detalhes da Vaga'}">Detalhes da Vaga | Gestão de Vagas</title>
@@ -44,8 +44,9 @@
                     <span>Voltar</span>
                 </a>
 
-                <!-- Botão Editar -->
+                <!-- Botão Editar (Apenas ADMIN e RECRUTADOR) -->
                 <a th:href="@{/vagas/{id}/editar(id=${vaga.id})}" 
+                   sec:authorize="hasAnyRole('ADMIN', 'RECRUTADOR')"
                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-200 hover:text-white text-xs sm:text-sm font-semibold transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -53,8 +54,9 @@
                     <span>Editar</span>
                 </a>
 
-                <!-- Botão Apagar -->
+                <!-- Botão Apagar (Apenas ADMIN e RECRUTADOR) -->
                 <button type="button" 
+                        sec:authorize="hasAnyRole('ADMIN', 'RECRUTADOR')"
                         onclick="abrirModalExclusao()"
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 text-xs sm:text-sm font-semibold transition-all cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -118,34 +120,36 @@
                     </div>
                 </div>
 
-                <!-- Ação de Candidatura -->
-                <div th:if="${jaCandidatado}" class="flex flex-col sm:flex-row items-start sm:items-center gap-2.5">
-                    <div class="px-4 py-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-950/20">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>Candidatura Enviada</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border"
-                              th:classappend="${minhaCandidatura != null ? minhaCandidatura.status.badgeClass : 'bg-slate-800 text-slate-300'}"
-                              th:text="${minhaCandidatura != null ? minhaCandidatura.status.descricao : 'Em Avaliação'}">
-                            Recebida
-                        </span>
+                <!-- Ação de Candidatura (Apenas CANDIDATO) -->
+                <div sec:authorize="hasRole('CANDIDATO')">
+                    <div th:if="${jaCandidatado}" class="flex flex-col sm:flex-row items-start sm:items-center gap-2.5">
+                        <div class="px-4 py-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-950/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Candidatura Enviada</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border"
+                                  th:classappend="${minhaCandidatura != null ? minhaCandidatura.status.badgeClass : 'bg-slate-800 text-slate-300'}"
+                                  th:text="${minhaCandidatura != null ? minhaCandidatura.status.descricao : 'Em Avaliação'}">
+                                Recebida
+                            </span>
+                        </div>
+                        <a th:href="@{/candidaturas}" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium underline underline-offset-4">
+                            Acompanhar
+                        </a>
                     </div>
-                    <a th:href="@{/candidaturas}" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium underline underline-offset-4">
-                        Acompanhar
-                    </a>
-                </div>
 
-                <form th:unless="${jaCandidatado}" th:action="@{/candidaturas/vaga/{vagaId}(vagaId=${vaga.id})}" method="post">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                    <button type="submit" 
-                            class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 active:scale-[0.99] text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                        <span>Candidatar-se Agora</span>
-                    </button>
-                </form>
+                    <form th:unless="${jaCandidatado}" th:action="@{/candidaturas/vaga/{vagaId}(vagaId=${vaga.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" 
+                                class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 active:scale-[0.99] text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                            <span>Candidatar-se Agora</span>
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <!-- Descrição e Atividades da Oportunidade -->
@@ -176,14 +180,14 @@
                 </div>
             </div>
 
-            <!-- Rodapé com Metadados e Ações Finais -->
+            <!-- Rodapé com Metadados e Ações Finais (Apenas ADMIN e RECRUTADOR) -->
             <div class="pt-6 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-slate-500">
                 <div>
                     <span th:if="${vaga.atualizado != null and vaga.atualizado != vaga.criado}">
                         Última atualização em <span class="text-slate-400 font-medium" th:text="${#temporals.format(vaga.atualizado, 'dd/MM/yyyy HH:mm')}">24/09/2026</span>
                     </span>
                 </div>
-                <div class="flex items-center gap-3">
+                <div sec:authorize="hasAnyRole('ADMIN', 'RECRUTADOR')" class="flex items-center gap-3">
                     <a th:href="@{/vagas/{id}/editar(id=${vaga.id})}" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
                         Editar esta vaga
                     </a>
@@ -196,8 +200,9 @@
 
         </article>
 
-        <!-- Seção: Candidatos Inscritos na Vaga -->
-        <section class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 space-y-6">
+        <!-- Seção: Candidatos Inscritos na Vaga (Apenas ADMIN e RECRUTADOR - Candidatos não veem outros candidatos) -->
+        <section sec:authorize="hasAnyRole('ADMIN', 'RECRUTADOR')" 
+                 class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
                 <div class="space-y-1">
                     <div class="flex items-center gap-2">
@@ -211,10 +216,21 @@
                     <p class="text-xs text-slate-400">Gerencie e atualize a etapa de cada profissional inscrito nesta oportunidade.</p>
                 </div>
 
-                <div class="flex items-center gap-2 text-xs text-slate-400">
+                <div class="flex items-center gap-2.5 text-xs text-slate-400">
                     <span class="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800">
                         Total: <strong class="text-indigo-400 font-semibold" th:text="${candidaturas != null ? candidaturas.size() : 0}">0</strong> candidato(s)
                     </span>
+
+                    <!-- Botão Atribuir Candidato (Apenas ADMIN) -->
+                    <button type="button" 
+                            sec:authorize="hasRole('ADMIN')"
+                            onclick="abrirModalAtribuir()"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold rounded-xl shadow-md shadow-indigo-600/25 transition-all cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Atribuir Candidato</span>
+                    </button>
                 </div>
             </div>
 
@@ -336,6 +352,55 @@
             </div>
         </div>
 
+        <!-- Modal de Atribuição de Candidato (Apenas ADMIN) -->
+        <div id="modalAtribuir" sec:authorize="hasRole('ADMIN')" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl shadow-slate-950 transform scale-95 transition-transform duration-200" id="modalAtribuirCard">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Atribuir Candidato</h3>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Vincule diretamente um profissional a esta vaga.</p>
+                    </div>
+                </div>
+
+                <form th:action="@{/candidaturas/atribuir}" method="post" class="space-y-4">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" name="vagaId" th:value="${vaga.id}" />
+
+                    <div>
+                        <label for="selectUsuarioId" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                            Selecione o Profissional
+                        </label>
+                        <select id="selectUsuarioId" name="usuarioId" required
+                                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                            <option value="" disabled selected>Escolha um profissional cadastrado...</option>
+                            <option th:each="candItem : ${todosCandidatos}" 
+                                    th:value="${candItem.id}" 
+                                    th:text="${(candItem.nome != null ? candItem.nome : candItem.email) + ' (' + (candItem.cargo != null ? candItem.cargo : 'Candidato') + ')'}">
+                                Mariana Silva (Desenvolvedora Java)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 mt-6 pt-2">
+                        <button type="button" 
+                                onclick="fecharModalAtribuir()" 
+                                class="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs sm:text-sm font-medium transition-colors cursor-pointer">
+                            Cancelar
+                        </button>
+                        <button type="submit" 
+                                class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg shadow-indigo-600/30 cursor-pointer">
+                            Confirmar Atribuição
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <script th:inline="javascript">
             function abrirModalExclusao() {
                 const modal = document.getElementById('modalExclusao');
@@ -350,6 +415,28 @@
             function fecharModalExclusao() {
                 const modal = document.getElementById('modalExclusao');
                 const card = document.getElementById('modalExclusaoCard');
+                modal.classList.add('opacity-0');
+                card.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 200);
+            }
+
+            function abrirModalAtribuir() {
+                const modal = document.getElementById('modalAtribuir');
+                if (!modal) return;
+                const card = document.getElementById('modalAtribuirCard');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    card.classList.remove('scale-95');
+                }, 10);
+            }
+
+            function fecharModalAtribuir() {
+                const modal = document.getElementById('modalAtribuir');
+                if (!modal) return;
+                const card = document.getElementById('modalAtribuirCard');
                 modal.classList.add('opacity-0');
                 card.classList.add('scale-95');
                 setTimeout(() => {

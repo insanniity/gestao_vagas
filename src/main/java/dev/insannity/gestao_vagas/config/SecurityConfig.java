@@ -15,6 +15,17 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/css/**", "/js/**", "/img/**").permitAll()
+                        // Banco de Talentos e Atribuição de Candidatos: Somente ADMIN
+                        .requestMatchers("/candidatos", "/candidatos/**").hasRole("ADMIN")
+                        .requestMatchers("/candidaturas/atribuir").hasRole("ADMIN")
+                        // Gestão de Vagas (Criar, Editar, Apagar): ADMIN e RECRUTADOR
+                        .requestMatchers("/vagas/nova", "/vagas/*/editar", "/vagas/*/apagar").hasAnyRole("ADMIN", "RECRUTADOR")
+                        // Alteração de Status de Candidatos na Vaga: ADMIN e RECRUTADOR
+                        .requestMatchers("/candidaturas/*/status").hasAnyRole("ADMIN", "RECRUTADOR")
+                        // Candidatar-se a vagas, Minhas Candidaturas e Cancelar: Apenas CANDIDATO
+                        .requestMatchers("/candidaturas", "/candidaturas/vaga/**", "/candidaturas/*/cancelar").hasRole("CANDIDATO")
+                        // Visualização de vagas e perfil pessoal: Qualquer usuário autenticado
+                        .requestMatchers("/vagas", "/vagas/**", "/perfil", "/").authenticated()
                         .anyRequest().authenticated())
                 .formLogin(login -> login
                         .loginPage("/login")
