@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/painel :: layout(~{::title}, 'candidaturas', ~{::#conteudo})}">
+<head>
+    <title>Minhas Candidaturas | Gestão de Vagas</title>
+</head>
+<body>
+    <div id="conteudo" class="space-y-8 max-w-5xl mx-auto">
+        
+        <!-- Feedback de Sucesso (Flash Message) -->
+        <div th:if="${sucesso != null}" 
+             class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-2xl p-4 flex items-center justify-between shadow-lg shadow-emerald-950/20">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <span class="text-xs sm:text-sm font-medium" th:text="${sucesso}">Operação realizada com sucesso!</span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-400/60 hover:text-emerald-300 p-1 cursor-pointer transition-colors" title="Fechar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Banner do Cabeçalho -->
+        <section class="bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-indigo-950/40 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-950/40 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div class="space-y-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                        Processos Seletivos
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Minhas Candidaturas
+                    </h1>
+                    <p class="text-sm text-slate-400">
+                        Acompanhe o andamento das vagas para as quais você se candidatou em tempo real.
+                    </p>
+                </div>
+                <a th:href="@{/vagas}" 
+                   class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer w-fit">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span>Explorar Mais Vagas</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Barra de Status / Total -->
+        <div class="flex items-center justify-between text-sm text-slate-400">
+            <div>
+                <span>Total de </span>
+                <strong class="text-white font-semibold" th:text="${candidaturas != null ? candidaturas.size() : 0}">0</strong>
+                <span> candidaturas ativas</span>
+            </div>
+        </div>
+
+        <!-- Lista de Candidaturas -->
+        <div th:if="${candidaturas != null and !#lists.isEmpty(candidaturas)}" class="space-y-4">
+            
+            <article th:each="cand : ${candidaturas}" 
+                     class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-indigo-500/40 rounded-3xl p-6 sm:p-7 shadow-xl shadow-slate-950/40 transition-all duration-200 group flex flex-col md:flex-row md:items-center justify-between gap-6">
+                
+                <div class="space-y-3 flex-1">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            <span th:text="${cand.vagaEmpresa}">Empresa</span>
+                        </span>
+
+                        <!-- Badge de Nível da Vaga -->
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700" 
+                              th:text="${cand.vagaLevel}">
+                            Nível
+                        </span>
+
+                        <!-- Badge de Status da Candidatura -->
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold border"
+                              th:classappend="${cand.status.badgeClass}"
+                              th:text="${cand.status.descricao}">
+                            Status
+                        </span>
+
+                        <span class="text-xs text-slate-500" th:if="${cand.dataCandidatura != null}">
+                            • Inscrito em <span th:text="${#temporals.format(cand.dataCandidatura, 'dd/MM/yyyy')}">24/09/2026</span>
+                        </span>
+                    </div>
+
+                    <!-- Título / Descrição da Vaga -->
+                    <a th:href="@{/vagas/{id}(id=${cand.vagaId})}" class="block group/link">
+                        <h2 class="text-base sm:text-lg font-semibold text-white group-hover/link:text-indigo-300 transition-colors leading-snug"
+                            th:text="${cand.vagaDescricao}">
+                            Descrição da vaga...
+                        </h2>
+                    </a>
+                </div>
+
+                <!-- Ações -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <a th:href="@{/vagas/{id}(id=${cand.vagaId})}" 
+                       class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>Ver Vaga</span>
+                    </a>
+
+                    <form th:action="@{/candidaturas/{id}/cancelar(id=${cand.id})}" method="post" onsubmit="return confirm('Deseja realmente cancelar sua candidatura para esta vaga?');">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" 
+                                class="px-3.5 py-2 rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 text-xs sm:text-sm font-semibold transition-colors cursor-pointer">
+                            Cancelar
+                        </button>
+                    </form>
+                </div>
+
+            </article>
+
+        </div>
+
+        <!-- Estado Vazio (Sem Candidaturas) -->
+        <div th:if="${candidaturas == null or #lists.isEmpty(candidaturas)}" 
+             class="bg-slate-900/60 border border-slate-800 rounded-3xl p-12 text-center space-y-4 max-w-xl mx-auto">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-lg font-bold text-white">Nenhuma candidatura registrada</h3>
+                <p class="text-xs sm:text-sm text-slate-400">
+                    Você ainda não se candidatou a nenhuma oportunidade. Explore as vagas disponíveis e dê o próximo passo na sua carreira.
+                </p>
+            </div>
+            <div class="pt-2">
+                <a th:href="@{/vagas}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all">
+                    Ver vagas disponíveis
+                </a>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

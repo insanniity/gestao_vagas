@@ -39,6 +39,17 @@ public class Usuario extends Doc implements UserDetails{
     LocalDateTime ultimoLogin;
     Permissao permissao;
 
+    String telefone;
+    String localizacao;
+    String cargo;
+    String resumo;
+    @Builder.Default
+    Boolean disponivelParaContratacao = true;
+    @Builder.Default
+    List<String> competencias = new ArrayList<>();
+    String linkedin;
+    String github;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();

@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import dev.insannity.gestao_vagas.docs.Usuario;
 import dev.insannity.gestao_vagas.docs.Vaga;
 import dev.insannity.gestao_vagas.payloads.VagaRequest;
+import dev.insannity.gestao_vagas.services.CandidaturaService;
+import dev.insannity.gestao_vagas.services.UsuarioService;
 import dev.insannity.gestao_vagas.services.VagaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class VagasController {
 
     private final VagaService vagaService;
+    private final CandidaturaService candidaturaService;
+    private final UsuarioService usuarioService;
 
     @ModelAttribute("niveis")
     public List<String> niveis() {
@@ -39,12 +44,23 @@ public class VagasController {
     public String index(
             @RequestParam(value = "q", required = false) String query,
             @PageableDefault(size = 10, sort = "criado", direction = Sort.Direction.DESC) Pageable pageable,
-            Model model) {
+            Model model,
+            java.security.Principal principal) {
 
         Page<Vaga> vagasPage = vagaService.listarTodas(query, pageable);
         model.addAttribute("vagasPage", vagasPage);
         model.addAttribute("vagas", vagasPage.getContent());
         model.addAttribute("query", query);
+
+        java.util.Set<String> minhasCandidaturasVagaIds = java.util.Collections.emptySet();
+        if (principal != null) {
+            minhasCandidaturasVagaIds = candidaturaService.listarMinhasCandidaturas(principal.getName())
+                    .stream()
+                    .map(dev.insannity.gestao_vagas.docs.Candidatura::getVagaId)
+                    .collect(java.util.stream.Collectors.toSet());
+        }
+        model.addAttribute("minhasCandidaturasVagaIds", minhasCandidaturasVagaIds);
+
         return "vagas/index";
     }
 
@@ -72,9 +88,24 @@ public class VagasController {
     }
 
     @GetMapping("/{id}")
-    public String ver(@PathVariable String id, Model model) {
+    public String ver(@PathVariable String id, Model model, java.security.Principal principal) {
         Vaga vaga = vagaService.buscarPorId(id);
         model.addAttribute("vaga", vaga);
+
+        List<dev.insannity.gestao_vagas.docs.Candidatura> candidaturas = candidaturaService.listarCandidatosDaVaga(id);
+        model.addAttribute("candidaturas", candidaturas);
+        model.addAttribute("todosStatus", dev.insannity.gestao_vagas.enums.StatusCandidatura.values());
+
+        if (principal != null) {
+            Usuario usuario = usuarioService.buscarPorEmail(principal.getName());
+            java.util.Optional<dev.insannity.gestao_vagas.docs.Candidatura> minhaCandidatura = candidaturaService.obterCandidatura(usuario.getId(), id);
+            model.addAttribute("jaCandidatado", minhaCandidatura.isPresent());
+            model.addAttribute("minhaCandidatura", minhaCandidatura.orElse(null));
+        } else {
+            model.addAttribute("jaCandidatado", false);
+            model.addAttribute("minhaCandidatura", null);
+        }
+
         return "vagas/detalhes";
     }
 

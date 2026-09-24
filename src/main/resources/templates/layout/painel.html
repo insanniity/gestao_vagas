@@ -43,17 +43,23 @@
 
             <!-- Navegação Desktop -->
             <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-                <a th:href="@{/vagas/}" 
+                <a th:href="@{/vagas}" 
                    class="transition-colors flex items-center gap-1.5"
                    th:classappend="${activeMenu == 'vagas' ? 'text-indigo-400 font-semibold' : 'hover:text-white'}">
                     <span th:if="${activeMenu == 'vagas'}" class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
                     Vagas Disponíveis
                 </a>
-                <a th:href="@{/perfil}" 
+                <a th:href="@{/candidaturas}" 
                    class="transition-colors flex items-center gap-1.5"
                    th:classappend="${activeMenu == 'candidaturas' ? 'text-indigo-400 font-semibold' : 'hover:text-white'}">
                     <span th:if="${activeMenu == 'candidaturas'}" class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
                     Minhas Candidaturas
+                </a>
+                <a th:href="@{/candidatos}" 
+                   class="transition-colors flex items-center gap-1.5"
+                   th:classappend="${activeMenu == 'candidatos' ? 'text-indigo-400 font-semibold' : 'hover:text-white'}">
+                    <span th:if="${activeMenu == 'candidatos'}" class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                    Candidatos Disponíveis
                 </a>
                 <a th:href="@{/perfil}" 
                    class="transition-colors flex items-center gap-1.5"

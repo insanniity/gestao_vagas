@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/painel :: layout(~{::title}, 'candidatos', ~{::#conteudo})}">
+<head>
+    <title>Candidatos Disponíveis | Gestão de Vagas</title>
+</head>
+<body>
+    <div id="conteudo" class="space-y-8">
+        
+        <!-- Banner de Boas-Vindas e Busca de Talentos -->
+        <section class="bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-indigo-950/40 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl shadow-slate-950/40 relative overflow-hidden">
+            <div class="max-w-3xl space-y-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Banco de Talentos
+                </span>
+                <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                    Conecte-se com os melhores profissionais de tecnologia
+                </h1>
+                <p class="text-sm sm:text-base text-slate-400">
+                    Descubra desenvolvedores, arquitetos de software e especialistas disponíveis no mercado para compor o seu time.
+                </p>
+
+                <!-- Barra de Pesquisa de Candidatos -->
+                <form th:action="@{/candidatos}" method="get" class="pt-2">
+                    <div class="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-950/80 border border-slate-700/80 rounded-2xl p-1.5 sm:p-2 shadow-2xl focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent transition-all">
+                        <div class="relative flex-1 flex items-center">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input 
+                                type="text" 
+                                name="q" 
+                                th:value="${query}" 
+                                placeholder="Busque por nome, cargo (Tech Lead, Java), competência (Spring, Kafka, Docker) ou cidade..." 
+                                class="w-full pl-10 pr-4 py-2.5 bg-transparent border-none text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-0"
+                            >
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a th:if="${query != null and !#strings.isEmpty(query)}" 
+                               th:href="@{/candidatos}" 
+                                class="px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors">
+                                Limpar
+                            </a>
+                            <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <span>Buscar</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Barra de Status e Contagem -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-slate-400">
+            <div>
+                <span>Exibindo </span>
+                <strong class="text-white font-semibold" th:text="${candidatos != null ? candidatos.size() : 0}">0</strong>
+                <span> profissionais disponíveis</span>
+                <span th:if="${query != null and !#strings.isEmpty(query)}">
+                    para o termo &ldquo;<span class="text-indigo-400 font-medium" th:text="${query}">Java</span>&rdquo;
+                </span>
+            </div>
+
+            <!-- Chips de Filtro Rápido -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+                <span class="text-slate-500">Sugestões:</span>
+                <a th:href="@{/candidatos(q='Java')}" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors">Java</a>
+                <a th:href="@{/candidatos(q='Spring Boot')}" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors">Spring Boot</a>
+                <a th:href="@{/candidatos(q='MongoDB')}" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors">MongoDB</a>
+                <a th:href="@{/candidatos(q='Docker')}" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors">Docker</a>
+            </div>
+        </div>
+
+        <!-- Grid de Candidatos -->
+        <div th:if="${candidatos != null and !#lists.isEmpty(candidatos)}" 
+             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <article th:each="candidato : ${candidatos}" 
+                     class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 hover:border-indigo-500/40 rounded-3xl p-6 shadow-xl shadow-slate-950/40 transition-all duration-200 group flex flex-col justify-between space-y-5">
+                
+                <div class="space-y-4">
+                    <!-- Topo do Card: Avatar e Dados -->
+                    <div class="flex items-start gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-blue-500 p-0.5 shadow-lg shadow-indigo-600/20 shrink-0">
+                            <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-xl font-bold text-indigo-400">
+                                <span th:text="${candidato.nome != null ? #strings.substring(candidato.nome, 0, 1).toUpperCase() : 'U'}">U</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1 min-w-0 flex-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <h2 class="text-base font-bold text-white group-hover:text-indigo-300 transition-colors truncate"
+                                    th:text="${candidato.nome != null ? candidato.nome : candidato.email}">
+                                    Nome do Profissional
+                                </h2>
+                            </div>
+                            <p class="text-xs font-medium text-indigo-400 truncate" 
+                               th:text="${candidato.cargo != null and !#strings.isEmpty(candidato.cargo) ? candidato.cargo : 'Desenvolvedor(a)'}">
+                                Desenvolvedor(a)
+                            </p>
+                            <p class="text-[11px] text-slate-500 flex items-center gap-1 truncate">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <span th:text="${candidato.localizacao != null and !#strings.isEmpty(candidato.localizacao) ? candidato.localizacao : 'Remoto / Brasil'}">Localização</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Resumo -->
+                    <p class="text-xs text-slate-400 line-clamp-3 leading-relaxed" 
+                       th:text="${candidato.resumo != null and !#strings.isEmpty(candidato.resumo) ? candidato.resumo : 'Profissional com sólida experiência em desenvolvimento de software e boas práticas de engenharia.'}">
+                        Resumo do perfil...
+                    </p>
+
+                    <!-- Competências -->
+                    <div class="space-y-1.5 pt-1">
+                        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Competências:</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span th:each="comp, iter : ${candidato.competencias}"
+                                  th:if="${iter.index < 4}" 
+                                  th:text="${comp}" 
+                                  class="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-slate-950 border border-slate-800 text-slate-300">
+                                Java
+                            </span>
+                            <span th:if="${candidato.competencias != null and candidato.competencias.size() > 4}"
+                                  th:text="${'+' + (candidato.competencias.size() - 4)}"
+                                  class="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                +3
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rodapé do Card: Links de Contato e Perfil -->
+                <div class="pt-4 border-t border-slate-800 flex items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2">
+                        <a th:if="${candidato.linkedin != null and !#strings.isEmpty(candidato.linkedin)}"
+                           th:href="${candidato.linkedin}" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           title="Perfil no LinkedIn"
+                           class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors">
+                            <span class="font-bold text-indigo-400 text-xs">in</span>
+                        </a>
+
+                        <a th:if="${candidato.github != null and !#strings.isEmpty(candidato.github)}"
+                           th:href="${candidato.github}" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           title="Perfil no GitHub"
+                           class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors">
+                            <svg class="w-3.5 h-3.5 text-indigo-400 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                            </svg>
+                        </a>
+
+                        <a th:if="${candidato.telefone != null and !#strings.isEmpty(candidato.telefone)}"
+                           th:href="'tel:' + ${candidato.telefone}" 
+                           title="Telefone / Contato"
+                           class="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-emerald-400 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <a th:href="@{/candidatos/{id}(id=${candidato.id})}" 
+                       class="px-3.5 py-1.5 rounded-xl bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white border border-indigo-500/20 font-semibold transition-all">
+                        Ver Perfil
+                    </a>
+                </div>
+
+            </article>
+
+        </div>
+
+        <!-- Estado Vazio -->
+        <div th:if="${candidatos == null or #lists.isEmpty(candidatos)}" 
+             class="bg-slate-900/60 border border-slate-800 rounded-3xl p-12 text-center space-y-4 max-w-xl mx-auto">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-lg font-bold text-white">Nenhum candidato encontrado</h3>
+                <p class="text-xs sm:text-sm text-slate-400">
+                    Não encontramos candidatos disponíveis para o filtro solicitado. Tente buscar por outros termos ou ver todos os talentos.
+                </p>
+            </div>
+            <div class="pt-2">
+                <a th:href="@{/candidatos}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-colors">
+                    Ver todos os candidatos
+                </a>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

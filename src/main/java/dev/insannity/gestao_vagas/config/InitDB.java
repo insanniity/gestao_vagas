@@ -7,9 +7,12 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import dev.insannity.gestao_vagas.docs.Candidatura;
 import dev.insannity.gestao_vagas.docs.Usuario;
 import dev.insannity.gestao_vagas.docs.Vaga;
 import dev.insannity.gestao_vagas.enums.Permissao;
+import dev.insannity.gestao_vagas.enums.StatusCandidatura;
+import dev.insannity.gestao_vagas.repositories.CandidaturaRepository;
 import dev.insannity.gestao_vagas.repositories.UsuarioRepository;
 import dev.insannity.gestao_vagas.repositories.VagaRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,19 +25,66 @@ public class InitDB implements ApplicationRunner {
 
     private final UsuarioRepository usuarioRepository;
     private final VagaRepository vagaRepository;
+    private final CandidaturaRepository candidaturaRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        candidaturaRepository.deleteAll();
         usuarioRepository.deleteAll();
+
         Usuario usuario = Usuario.builder()
             .nome("Administrador")
             .ativo(true)
             .email("admin@insannity.dev")
             .permissao(Permissao.ADMIN)
             .senha(passwordEncoder.encode("admin123"))
+            .cargo("Tech Lead & Desenvolvedor Full Stack")
+            .localizacao("São Paulo, SP (Remoto)")
+            .telefone("(11) 98765-4321")
+            .resumo("Desenvolvedor de software sênior com vasta experiência no ecossistema Spring Boot, MongoDB e arquiteturas de alta escalabilidade. Entusiasta de Clean Code, boas práticas e liderança técnica.")
+            .disponivelParaContratacao(true)
+            .competencias(List.of("Java 21", "Spring Boot", "MongoDB", "RESTful APIs", "Docker", "Tailwind CSS", "Microsserviços", "Git & GitHub"))
+            .linkedin("https://linkedin.com/in/insannity")
+            .github("https://github.com/insannity")
             .build();
-        usuarioRepository.save(usuario);
+        usuario = usuarioRepository.save(usuario);
+
+        Usuario cand1 = Usuario.builder()
+            .nome("Mariana Silva")
+            .ativo(true)
+            .email("mariana.silva@insannity.dev")
+            .permissao(Permissao.CANDIDATO)
+            .senha(passwordEncoder.encode("candidato123"))
+            .cargo("Desenvolvedora Java Pleno")
+            .localizacao("Belo Horizonte, MG (Remoto)")
+            .telefone("(31) 99123-4567")
+            .resumo("Desenvolvedora Java com 4 anos de experiência em APIs REST, mensageria com Apache Kafka, testes automatizados e cloud AWS.")
+            .disponivelParaContratacao(true)
+            .competencias(List.of("Java", "Spring Boot", "Kafka", "PostgreSQL", "Docker", "JUnit 5", "AWS"))
+            .linkedin("https://linkedin.com/in/mariana-silva-dev")
+            .github("https://github.com/mariana-silva")
+            .build();
+        cand1 = usuarioRepository.save(cand1);
+
+        Usuario cand2 = Usuario.builder()
+            .nome("Lucas Santos")
+            .ativo(true)
+            .email("lucas.santos@insannity.dev")
+            .permissao(Permissao.CANDIDATO)
+            .senha(passwordEncoder.encode("candidato123"))
+            .cargo("Engenheiro de Software Sênior")
+            .localizacao("Curitiba, PR (Híbrido)")
+            .telefone("(41) 98888-7766")
+            .resumo("Especialista em microsserviços de alto desempenho, concorrência, Kubernetes e arquiteturas orientadas a eventos.")
+            .disponivelParaContratacao(true)
+            .competencias(List.of("Java 21", "Spring Cloud", "Kubernetes", "Redis", "MongoDB", "RabbitMQ", "CI/CD"))
+            .linkedin("https://linkedin.com/in/lucas-santos-dev")
+            .github("https://github.com/lucas-santos")
+            .build();
+        cand2 = usuarioRepository.save(cand2);
+
+        log.info("Usuários criados com sucesso: admin, mariana, lucas.");
         log.info("Usuário inicial criado: {}", usuario.getEmail());
 
         vagaRepository.deleteAll();
@@ -160,8 +210,90 @@ public class InitDB implements ApplicationRunner {
                 .beneficios("Contratação PJ/CLT flexível, Bônus por entregas, Equipamento Apple/Dell fornecido pela empresa, Horários 100% livres")
                 .build()
         );
-        vagaRepository.saveAll(vagas);
+        vagas = vagaRepository.saveAll(vagas);
         log.info("{} vagas inseridas com sucesso.", vagas.size());
+
+        if (!vagas.isEmpty()) {
+            Vaga v1 = vagas.get(0);
+            Vaga v2 = vagas.size() > 1 ? vagas.get(1) : v1;
+            Vaga v3 = vagas.size() > 2 ? vagas.get(2) : v1;
+
+            List<Candidatura> candidaturasIniciais = List.of(
+                Candidatura.builder()
+                    .usuarioId(usuario.getId())
+                    .usuarioNome(usuario.getNome())
+                    .usuarioEmail(usuario.getEmail())
+                    .usuarioTelefone(usuario.getTelefone())
+                    .usuarioCargo(usuario.getCargo())
+                    .usuarioLinkedin(usuario.getLinkedin())
+                    .usuarioGithub(usuario.getGithub())
+                    .vagaId(v1.getId())
+                    .vagaEmpresa(v1.getEmpresa())
+                    .vagaDescricao(v1.getDescricao())
+                    .vagaLevel(v1.getLevel())
+                    .status(StatusCandidatura.ENTREVISTA_TECNICA)
+                    .build(),
+                Candidatura.builder()
+                    .usuarioId(cand1.getId())
+                    .usuarioNome(cand1.getNome())
+                    .usuarioEmail(cand1.getEmail())
+                    .usuarioTelefone(cand1.getTelefone())
+                    .usuarioCargo(cand1.getCargo())
+                    .usuarioLinkedin(cand1.getLinkedin())
+                    .usuarioGithub(cand1.getGithub())
+                    .vagaId(v1.getId())
+                    .vagaEmpresa(v1.getEmpresa())
+                    .vagaDescricao(v1.getDescricao())
+                    .vagaLevel(v1.getLevel())
+                    .status(StatusCandidatura.EM_TRIAGEM)
+                    .build(),
+                Candidatura.builder()
+                    .usuarioId(cand2.getId())
+                    .usuarioNome(cand2.getNome())
+                    .usuarioEmail(cand2.getEmail())
+                    .usuarioTelefone(cand2.getTelefone())
+                    .usuarioCargo(cand2.getCargo())
+                    .usuarioLinkedin(cand2.getLinkedin())
+                    .usuarioGithub(cand2.getGithub())
+                    .vagaId(v1.getId())
+                    .vagaEmpresa(v1.getEmpresa())
+                    .vagaDescricao(v1.getDescricao())
+                    .vagaLevel(v1.getLevel())
+                    .status(StatusCandidatura.APROVADO)
+                    .build(),
+                Candidatura.builder()
+                    .usuarioId(cand1.getId())
+                    .usuarioNome(cand1.getNome())
+                    .usuarioEmail(cand1.getEmail())
+                    .usuarioTelefone(cand1.getTelefone())
+                    .usuarioCargo(cand1.getCargo())
+                    .usuarioLinkedin(cand1.getLinkedin())
+                    .usuarioGithub(cand1.getGithub())
+                    .vagaId(v2.getId())
+                    .vagaEmpresa(v2.getEmpresa())
+                    .vagaDescricao(v2.getDescricao())
+                    .vagaLevel(v2.getLevel())
+                    .status(StatusCandidatura.RECEBIDA)
+                    .build(),
+                Candidatura.builder()
+                    .usuarioId(cand2.getId())
+                    .usuarioNome(cand2.getNome())
+                    .usuarioEmail(cand2.getEmail())
+                    .usuarioTelefone(cand2.getTelefone())
+                    .usuarioCargo(cand2.getCargo())
+                    .usuarioLinkedin(cand2.getLinkedin())
+                    .usuarioGithub(cand2.getGithub())
+                    .vagaId(v3.getId())
+                    .vagaEmpresa(v3.getEmpresa())
+                    .vagaDescricao(v3.getDescricao())
+                    .vagaLevel(v3.getLevel())
+                    .status(StatusCandidatura.RECEBIDA)
+                    .build()
+            );
+
+            candidaturaRepository.saveAll(candidaturasIniciais);
+            log.info("{} candidaturas de exemplo inseridas com sucesso.", candidaturasIniciais.size());
+        }
     }
 
 }
