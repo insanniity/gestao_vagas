@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/painel :: layout(~{::title}, 'servicos', ~{::#conteudo})}">
+<head>
+    <title>Editar Serviço | Gestão de Vagas</title>
+</head>
+<body>
+    <div id="conteudo" class="space-y-8 max-w-4xl mx-auto">
+        
+        <!-- Breadcrumb e Cabeçalho -->
+        <div class="space-y-2">
+            <nav class="flex items-center gap-2 text-xs text-slate-400">
+                <a th:href="@{/servicos}" class="hover:text-emerald-400 transition-colors">Serviços</a>
+                <span>/</span>
+                <a th:href="@{/servicos/{id}(id=${servicoId})}" class="hover:text-emerald-400 transition-colors">Detalhes</a>
+                <span>/</span>
+                <span class="text-slate-200 font-medium">Editar Serviço</span>
+            </nav>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Editar Serviço Profissional
+                    </h1>
+                    <p class="text-sm text-slate-400 mt-1">
+                        Atualize as informações, escopo e precificação do seu serviço anunciado.
+                    </p>
+                </div>
+                <a th:href="@{/servicos/{id}(id=${servicoId})}" 
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800 text-slate-300 hover:text-white text-xs sm:text-sm font-medium transition-all w-fit">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Voltar aos Detalhes</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Formulário de Edição -->
+        <div class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl shadow-slate-950/40 relative overflow-hidden">
+            <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500"></div>
+
+            <form th:action="@{/servicos/{id}/editar(id=${servicoId})}" th:object="${servicoRequest}" method="post" class="space-y-6">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <!-- Campo Título -->
+                <div class="space-y-1.5">
+                    <label for="titulo" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                        Título do Serviço <span class="text-red-400">*</span>
+                    </label>
+                    <input type="text" 
+                           id="titulo" 
+                           th:field="*{titulo}" 
+                           placeholder="Ex: Desenvolvimento de Microsserviços com Spring Boot e Kafka" 
+                           class="w-full px-4 py-2.5 bg-slate-950/60 border rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                           th:classappend="${#fields.hasErrors('titulo')} ? 'border-red-500/80 focus:ring-red-500' : 'border-slate-700/80'">
+                    <p th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}" class="text-xs text-red-400 pt-0.5">
+                        Mensagem de erro
+                    </p>
+                </div>
+
+                <!-- Grid de Categoria e Modelo de Cobrança -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    
+                    <!-- Categoria -->
+                    <div class="space-y-1.5">
+                        <label for="categoria" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            Categoria <span class="text-red-400">*</span>
+                        </label>
+                        <select id="categoria" 
+                                th:field="*{categoria}" 
+                                class="w-full px-4 py-2.5 bg-slate-950/60 border rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all cursor-pointer"
+                                th:classappend="${#fields.hasErrors('categoria')} ? 'border-red-500/80 focus:ring-red-500' : 'border-slate-700/80'">
+                            <option th:each="cat : ${todasCategorias}" 
+                                    th:value="${cat}" 
+                                    th:text="${cat.descricao}"
+                                    class="bg-slate-900 text-slate-100">
+                                Categoria
+                            </option>
+                        </select>
+                        <p th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}" class="text-xs text-red-400 pt-0.5">
+                            Mensagem de erro
+                        </p>
+                    </div>
+
+                    <!-- Tipo de Preço -->
+                    <div class="space-y-1.5">
+                        <label for="tipoPreco" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            Modelo de Precificação <span class="text-red-400">*</span>
+                        </label>
+                        <select id="tipoPreco" 
+                                th:field="*{tipoPreco}" 
+                                class="w-full px-4 py-2.5 bg-slate-950/60 border rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all cursor-pointer"
+                                th:classappend="${#fields.hasErrors('tipoPreco')} ? 'border-red-500/80 focus:ring-red-500' : 'border-slate-700/80'">
+                            <option th:each="tp : ${todosTiposPreco}" 
+                                    th:value="${tp}" 
+                                    th:text="${tp.descricao}"
+                                    class="bg-slate-900 text-slate-100">
+                                Por Hora
+                            </option>
+                        </select>
+                        <p th:if="${#fields.hasErrors('tipoPreco')}" th:errors="*{tipoPreco}" class="text-xs text-red-400 pt-0.5">
+                            Mensagem de erro
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Grid de Preço e Prazo Estimado -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    
+                    <!-- Preço em Reais -->
+                    <div class="space-y-1.5">
+                        <label for="preco" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            Valor Estimado (R$)
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-xs font-bold text-slate-400">R$</span>
+                            <input type="number" 
+                                   id="preco" 
+                                   step="0.01" 
+                                   min="0"
+                                   th:field="*{preco}" 
+                                   placeholder="150.00" 
+                                   class="w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                        </div>
+                        <span class="text-[11px] text-slate-500 block">Deixe em branco se a precificação for "A Combinar".</span>
+                    </div>
+
+                    <!-- Prazo Estimado -->
+                    <div class="space-y-1.5">
+                        <label for="prazoEstimado" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            Prazo de Entrega Estimado
+                        </label>
+                        <input type="text" 
+                               id="prazoEstimado" 
+                               th:field="*{prazoEstimado}" 
+                               placeholder="Ex: 3 a 5 dias úteis, 1 semana, A combinar" 
+                               class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                    </div>
+
+                </div>
+
+                <!-- Tecnologias e Ferramentas -->
+                <div class="space-y-1.5">
+                    <label for="tecnologiasTexto" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                        Tecnologias e Ferramentas Dominadas
+                    </label>
+                    <input type="text" 
+                           id="tecnologiasTexto" 
+                           th:field="*{tecnologiasTexto}" 
+                           placeholder="Java, Spring Boot, PostgreSQL, Docker, AWS (separadas por vírgula)" 
+                           class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-700/80 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                </div>
+
+                <!-- Descrição e Escopo do Serviço -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label for="descricao" class="block text-xs font-semibold uppercase tracking-wider text-slate-300">
+                            Descrição Detalhada do Escopo e Entregas <span class="text-red-400">*</span>
+                        </label>
+                        <span class="text-xs text-slate-500">Mínimo 10 caracteres</span>
+                    </div>
+                    <textarea id="descricao" 
+                              th:field="*{descricao}" 
+                              rows="6"
+                              placeholder="Descreva o escopo e entregas..." 
+                              class="w-full p-4 bg-slate-950/60 border rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                              th:classappend="${#fields.hasErrors('descricao')} ? 'border-red-500/80 focus:ring-red-500' : 'border-slate-700/80'"></textarea>
+                    <p th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}" class="text-xs text-red-400 pt-0.5">
+                        Mensagem de erro
+                    </p>
+                </div>
+
+                <!-- Checkbox Ativo -->
+                <div class="pt-2 flex items-center gap-3">
+                    <input type="checkbox" 
+                           id="ativo" 
+                           th:field="*{ativo}" 
+                           class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900 cursor-pointer">
+                    <label for="ativo" class="text-xs sm:text-sm text-slate-300 cursor-pointer select-none">
+                        Anúncio ativo e visível na vitrine pública de serviços
+                    </label>
+                </div>
+
+                <!-- Barra de Ações -->
+                <div class="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+                    <a th:href="@{/servicos/{id}(id=${servicoId})}" 
+                       class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] text-white text-xs sm:text-sm font-semibold rounded-xl shadow-lg shadow-emerald-600/30 transition-all cursor-pointer flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Salvar Alterações</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</body>
+</html>

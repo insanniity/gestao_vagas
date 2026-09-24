@@ -24,8 +24,10 @@ public class SecurityConfig {
                         .requestMatchers("/candidaturas/*/status").hasAnyRole("ADMIN", "RECRUTADOR")
                         // Candidatar-se a vagas, Minhas Candidaturas e Cancelar: Apenas CANDIDATO
                         .requestMatchers("/candidaturas", "/candidaturas/vaga/**", "/candidaturas/*/cancelar").hasRole("CANDIDATO")
-                        // Visualização de vagas e perfil pessoal: Qualquer usuário autenticado
-                        .requestMatchers("/vagas", "/vagas/**", "/perfil", "/").authenticated()
+                        // Venda de Serviços: criação e gerenciamento restrito a CANDIDATO
+                        .requestMatchers("/servicos/novo", "/servicos/meus-servicos").hasRole("CANDIDATO")
+                        // Visualização de vagas, serviços e perfil pessoal: Qualquer usuário autenticado
+                        .requestMatchers("/vagas", "/vagas/**", "/servicos", "/servicos/**", "/perfil", "/").authenticated()
                         .anyRequest().authenticated())
                 .formLogin(login -> login
                         .loginPage("/login")

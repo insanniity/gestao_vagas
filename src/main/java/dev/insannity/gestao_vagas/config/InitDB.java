@@ -26,10 +26,12 @@ public class InitDB implements ApplicationRunner {
     private final UsuarioRepository usuarioRepository;
     private final VagaRepository vagaRepository;
     private final CandidaturaRepository candidaturaRepository;
+    private final dev.insannity.gestao_vagas.repositories.ServicoRepository servicoRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        servicoRepository.deleteAll();
         candidaturaRepository.deleteAll();
         usuarioRepository.deleteAll();
 
@@ -310,6 +312,84 @@ public class InitDB implements ApplicationRunner {
             candidaturaRepository.saveAll(candidaturasIniciais);
             log.info("{} candidaturas de exemplo inseridas com sucesso.", candidaturasIniciais.size());
         }
+
+        // Seed de Serviços Profissionais dos Candidatos
+        List<dev.insannity.gestao_vagas.docs.Servico> servicosExemplo = List.of(
+            dev.insannity.gestao_vagas.docs.Servico.builder()
+                .titulo("Desenvolvimento de APIs RESTful e Microsserviços Spring Boot")
+                .descricao("Criação de back-ends robustos e seguros com Spring Boot 3, arquitetura em camadas, validações avançadas, autenticação JWT/OAuth2, persistência em PostgreSQL/MongoDB e testes unitários com JUnit 5 e Mockito.")
+                .categoria(dev.insannity.gestao_vagas.enums.CategoriaServico.DESENVOLVIMENTO_BACKEND)
+                .tipoPreco(dev.insannity.gestao_vagas.enums.TipoPrecoServico.POR_PROJETO)
+                .preco(new java.math.BigDecimal("2800.00"))
+                .prazoEstimado("7 a 10 dias úteis")
+                .tecnologias(List.of("Java 21", "Spring Boot", "PostgreSQL", "Docker", "JUnit 5", "REST APIs"))
+                .ativo(true)
+                .usuarioId(cand1.getId())
+                .usuarioNome(cand1.getNome())
+                .usuarioEmail(cand1.getEmail())
+                .usuarioTelefone(cand1.getTelefone())
+                .usuarioCargo(cand1.getCargo())
+                .usuarioLinkedin(cand1.getLinkedin())
+                .usuarioGithub(cand1.getGithub())
+                .build(),
+
+            dev.insannity.gestao_vagas.docs.Servico.builder()
+                .titulo("Mentoria Individual & Code Review para Desenvolvedores Java")
+                .descricao("Sessões práticas 1:1 focadas em evolução de carreira, Clean Architecture, padrões de projeto GOF, preparação para entrevistas técnicas e revisão aprofundada de código.")
+                .categoria(dev.insannity.gestao_vagas.enums.CategoriaServico.MENTORIA_CODE_REVIEW)
+                .tipoPreco(dev.insannity.gestao_vagas.enums.TipoPrecoServico.POR_HORA)
+                .preco(new java.math.BigDecimal("130.00"))
+                .prazoEstimado("Agendamento flexível")
+                .tecnologias(List.of("Java", "Clean Code", "SOLID", "Arquitetura", "Entrevistas"))
+                .ativo(true)
+                .usuarioId(cand1.getId())
+                .usuarioNome(cand1.getNome())
+                .usuarioEmail(cand1.getEmail())
+                .usuarioTelefone(cand1.getTelefone())
+                .usuarioCargo(cand1.getCargo())
+                .usuarioLinkedin(cand1.getLinkedin())
+                .usuarioGithub(cand1.getGithub())
+                .build(),
+
+            dev.insannity.gestao_vagas.docs.Servico.builder()
+                .titulo("Consultoria de Alta Performance e Arquitetura de Microsserviços")
+                .descricao("Diagnóstico e desenho de arquiteturas orientadas a eventos de alta escala. Otimização de concorrência, dimensionamento de clusters Kubernetes, mensageria com Kafka/RabbitMQ e caching distribuído com Redis.")
+                .categoria(dev.insannity.gestao_vagas.enums.CategoriaServico.ARQUITETURA_CONSULTORIA)
+                .tipoPreco(dev.insannity.gestao_vagas.enums.TipoPrecoServico.POR_HORA)
+                .preco(new java.math.BigDecimal("260.00"))
+                .prazoEstimado("Sob demanda")
+                .tecnologias(List.of("Java 21", "Kubernetes", "Kafka", "Redis", "Cloud AWS", "Observabilidade"))
+                .ativo(true)
+                .usuarioId(cand2.getId())
+                .usuarioNome(cand2.getNome())
+                .usuarioEmail(cand2.getEmail())
+                .usuarioTelefone(cand2.getTelefone())
+                .usuarioCargo(cand2.getCargo())
+                .usuarioLinkedin(cand2.getLinkedin())
+                .usuarioGithub(cand2.getGithub())
+                .build(),
+
+            dev.insannity.gestao_vagas.docs.Servico.builder()
+                .titulo("Modelagem e Otimização de Bancos NoSQL e MongoDB")
+                .descricao("Modelagem orientada a documentos, indexação avançada, agregações complexas, redução de latência e tuning de consultas para aplicações de alta demanda.")
+                .categoria(dev.insannity.gestao_vagas.enums.CategoriaServico.BANCO_DE_DADOS)
+                .tipoPreco(dev.insannity.gestao_vagas.enums.TipoPrecoServico.POR_PROJETO)
+                .preco(new java.math.BigDecimal("3500.00"))
+                .prazoEstimado("5 dias úteis")
+                .tecnologias(List.of("MongoDB", "NoSQL", "Query Tuning", "Aggregation Pipeline", "Sharding"))
+                .ativo(true)
+                .usuarioId(cand2.getId())
+                .usuarioNome(cand2.getNome())
+                .usuarioEmail(cand2.getEmail())
+                .usuarioTelefone(cand2.getTelefone())
+                .usuarioCargo(cand2.getCargo())
+                .usuarioLinkedin(cand2.getLinkedin())
+                .usuarioGithub(cand2.getGithub())
+                .build()
+        );
+
+        servicoRepository.saveAll(servicosExemplo);
+        log.info("{} serviços profissionais de candidatos cadastrados no marketplace.", servicosExemplo.size());
     }
 
 }
