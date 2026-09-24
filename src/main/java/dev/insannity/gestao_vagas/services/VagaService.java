@@ -49,8 +49,23 @@ public class VagaService {
         vaga.setLevel(request.getLevel() != null ? request.getLevel().trim().toUpperCase() : null);
         vaga.setDescricao(request.getDescricao() != null ? request.getDescricao().trim() : null);
         vaga.setBeneficios(request.getBeneficios() != null ? request.getBeneficios().trim() : null);
+        if (request.getEncerrada() != null) {
+            vaga.setEncerrada(request.getEncerrada());
+        }
         vaga.setAtualizado(LocalDateTime.now());
         return vagaRepository.save(vaga);
+    }
+
+    public void encerrar(String id) {
+        Vaga vaga = buscarPorId(id);
+        vaga.encerrar();
+        vagaRepository.save(vaga);
+    }
+
+    public void reabrir(String id) {
+        Vaga vaga = buscarPorId(id);
+        vaga.reabrir();
+        vagaRepository.save(vaga);
     }
 
     public void apagar(String id) {

@@ -11,6 +11,7 @@ import dev.insannity.gestao_vagas.docs.Usuario;
 import dev.insannity.gestao_vagas.docs.Vaga;
 import dev.insannity.gestao_vagas.enums.StatusCandidatura;
 import dev.insannity.gestao_vagas.exceptions.RecursoNaoEncontradoException;
+import dev.insannity.gestao_vagas.exceptions.RegraNegocioException;
 import dev.insannity.gestao_vagas.repositories.CandidaturaRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,10 @@ public class CandidaturaService {
     public Candidatura candidatar(String emailUsuario, String vagaId) {
         Usuario usuario = usuarioService.buscarPorEmail(emailUsuario);
         Vaga vaga = vagaService.buscarPorId(vagaId);
+
+        if (vaga.isEncerrada()) {
+            throw new RegraNegocioException("Esta vaga foi encerrada e não aceita novas candidaturas.");
+        }
 
         Optional<Candidatura> existente = candidaturaRepository.findByUsuarioIdAndVagaIdAndDeletadoIsNull(usuario.getId(), vagaId);
         if (existente.isPresent()) {
@@ -95,6 +100,10 @@ public class CandidaturaService {
     public Candidatura atribuirCandidatoAVaga(String usuarioId, String vagaId) {
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
         Vaga vaga = vagaService.buscarPorId(vagaId);
+
+        if (vaga.isEncerrada()) {
+            throw new RegraNegocioException("Não é possível atribuir candidatos a uma vaga encerrada.");
+        }
 
         Optional<Candidatura> existente = candidaturaRepository.findByUsuarioIdAndVagaIdAndDeletadoIsNull(usuario.getId(), vagaId);
         if (existente.isPresent()) {

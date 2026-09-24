@@ -27,4 +27,21 @@ public class Vaga extends Doc {
     String level;
     String empresa;
 
+    @Builder.Default
+    Boolean encerrada = false;
+
+    public boolean isEncerrada() {
+        return Boolean.TRUE.equals(this.encerrada);
+    }
+
+    public void encerrar() {
+        this.encerrada = true;
+        setAtualizado(java.time.LocalDateTime.now());
+    }
+
+    public void reabrir() {
+        this.encerrada = false;
+        setAtualizado(java.time.LocalDateTime.now());
+    }
+
 }

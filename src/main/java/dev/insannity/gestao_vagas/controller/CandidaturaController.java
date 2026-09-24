@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import dev.insannity.gestao_vagas.docs.Candidatura;
 import dev.insannity.gestao_vagas.enums.StatusCandidatura;
+import dev.insannity.gestao_vagas.exceptions.RegraNegocioException;
 import dev.insannity.gestao_vagas.services.CandidaturaService;
 import lombok.RequiredArgsConstructor;
 
@@ -40,8 +41,12 @@ public class CandidaturaController {
             Principal principal,
             RedirectAttributes redirectAttributes) {
 
-        candidaturaService.candidatar(principal.getName(), vagaId);
-        redirectAttributes.addFlashAttribute("sucesso", "Candidatura enviada com sucesso! Acompanhe o processo em Minhas Candidaturas.");
+        try {
+            candidaturaService.candidatar(principal.getName(), vagaId);
+            redirectAttributes.addFlashAttribute("sucesso", "Candidatura enviada com sucesso! Acompanhe o processo em Minhas Candidaturas.");
+        } catch (RegraNegocioException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+        }
         return "redirect:/vagas/" + vagaId;
     }
 
@@ -77,8 +82,12 @@ public class CandidaturaController {
             @RequestParam("vagaId") String vagaId,
             RedirectAttributes redirectAttributes) {
 
-        candidaturaService.atribuirCandidatoAVaga(usuarioId, vagaId);
-        redirectAttributes.addFlashAttribute("sucesso", "Candidato vinculado à vaga com sucesso!");
+        try {
+            candidaturaService.atribuirCandidatoAVaga(usuarioId, vagaId);
+            redirectAttributes.addFlashAttribute("sucesso", "Candidato vinculado à vaga com sucesso!");
+        } catch (RegraNegocioException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+        }
         return "redirect:/vagas/" + vagaId;
     }
 

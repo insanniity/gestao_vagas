@@ -155,6 +155,22 @@ public class VagasController {
         return "redirect:/vagas/" + id;
     }
 
+    @PostMapping("/{id}/encerrar")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'RECRUTADOR')")
+    public String encerrar(@PathVariable String id, RedirectAttributes redirectAttributes) {
+        vagaService.encerrar(id);
+        redirectAttributes.addFlashAttribute("sucesso", "Vaga encerrada com sucesso! Novas candidaturas foram bloqueadas.");
+        return "redirect:/vagas/" + id;
+    }
+
+    @PostMapping("/{id}/reabrir")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'RECRUTADOR')")
+    public String reabrir(@PathVariable String id, RedirectAttributes redirectAttributes) {
+        vagaService.reabrir(id);
+        redirectAttributes.addFlashAttribute("sucesso", "Vaga reaberta com sucesso! Novas candidaturas foram liberadas.");
+        return "redirect:/vagas/" + id;
+    }
+
     @PostMapping("/{id}/apagar")
     @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('ADMIN', 'RECRUTADOR')")
     public String apagar(@PathVariable String id, RedirectAttributes redirectAttributes) {

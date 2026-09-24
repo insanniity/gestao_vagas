@@ -25,6 +25,24 @@
             </button>
         </div>
 
+        <!-- Feedback de Erro (Flash Message) -->
+        <div th:if="${erro != null}" 
+             class="bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-2xl p-4 flex items-center justify-between shadow-lg shadow-rose-950/20">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span class="text-xs sm:text-sm font-medium" th:text="${erro}">Ocorreu um erro na operação.</span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-rose-400/60 hover:text-rose-300 p-1 cursor-pointer transition-colors" title="Fechar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
         <!-- Breadcrumb e Barra de Navegação Superior -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <nav class="flex items-center gap-2 text-xs text-slate-400">
@@ -35,7 +53,7 @@
                 <span class="text-indigo-400 font-medium">Detalhes</span>
             </nav>
 
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-2.5 flex-wrap">
                 <a th:href="@{/vagas}" 
                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 hover:text-white text-xs sm:text-sm font-medium transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,6 +61,34 @@
                     </svg>
                     <span>Voltar</span>
                 </a>
+
+                <!-- Botão Encerrar Vaga (se aberta, apenas ADMIN e RECRUTADOR) -->
+                <button type="button" 
+                        sec:authorize="hasAnyRole('ADMIN', 'RECRUTADOR')"
+                        th:if="${vaga.encerrada == null or !vaga.encerrada}"
+                        onclick="abrirModalEncerrar()"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 text-xs sm:text-sm font-semibold transition-all cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    <span>Encerrar Vaga</span>
+                </button>
+
+                <!-- Botão Reabrir Vaga (se encerrada, apenas ADMIN e RECRUTADOR) -->
+                <form sec:authorize="hasAnyRole('ADMIN', 'RECRUTADOR')"
+                      th:if="${vaga.encerrada != null and vaga.encerrada}"
+                      th:action="@{/vagas/{id}/reabrir(id=${vaga.id})}" 
+                      method="post" 
+                      class="inline">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" 
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 text-xs sm:text-sm font-semibold transition-all cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span>Reabrir Vaga</span>
+                    </button>
+                </form>
 
                 <!-- Botão Editar (Apenas ADMIN e RECRUTADOR) -->
                 <a th:href="@{/vagas/{id}/editar(id=${vaga.id})}" 
@@ -107,9 +153,18 @@
                                 Nível
                             </span>
 
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <!-- Badge de Status: Ativa vs Encerrada -->
+                            <span th:if="${vaga.encerrada == null or !vaga.encerrada}" 
+                                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                                 Vaga Ativa
+                            </span>
+                            <span th:if="${vaga.encerrada != null and vaga.encerrada}" 
+                                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                Vaga Encerrada
                             </span>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-400 flex items-center gap-3">
@@ -122,6 +177,7 @@
 
                 <!-- Ação de Candidatura (Apenas CANDIDATO) -->
                 <div sec:authorize="hasRole('CANDIDATO')">
+                    <!-- Se já candidatado -->
                     <div th:if="${jaCandidatado}" class="flex flex-col sm:flex-row items-start sm:items-center gap-2.5">
                         <div class="px-4 py-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center gap-2 text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-950/20">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -139,7 +195,17 @@
                         </a>
                     </div>
 
-                    <form th:unless="${jaCandidatado}" th:action="@{/candidaturas/vaga/{vagaId}(vagaId=${vaga.id})}" method="post">
+                    <!-- Se não candidatado e vaga encerrada -->
+                    <div th:if="${!jaCandidatado and vaga.encerrada != null and vaga.encerrada}" 
+                         class="px-5 py-2.5 rounded-xl bg-slate-800/90 border border-slate-700 text-slate-400 flex items-center gap-2 text-xs sm:text-sm font-semibold select-none shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span>Candidaturas Encerradas</span>
+                    </div>
+
+                    <!-- Se não candidatado e vaga aberta -->
+                    <form th:if="${!jaCandidatado and (vaga.encerrada == null or !vaga.encerrada)}" th:action="@{/candidaturas/vaga/{vagaId}(vagaId=${vaga.id})}" method="post">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit" 
                                 class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 active:scale-[0.99] text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2">
@@ -221,9 +287,10 @@
                         Total: <strong class="text-indigo-400 font-semibold" th:text="${candidaturas != null ? candidaturas.size() : 0}">0</strong> candidato(s)
                     </span>
 
-                    <!-- Botão Atribuir Candidato (Apenas ADMIN) -->
+                    <!-- Botão Atribuir Candidato (Apenas ADMIN e se aberta) -->
                     <button type="button" 
                             sec:authorize="hasRole('ADMIN')"
+                            th:if="${vaga.encerrada == null or !vaga.encerrada}"
                             onclick="abrirModalAtribuir()"
                             class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold rounded-xl shadow-md shadow-indigo-600/25 transition-all cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -231,6 +298,11 @@
                         </svg>
                         <span>Atribuir Candidato</span>
                     </button>
+                    <span sec:authorize="hasRole('ADMIN')"
+                          th:if="${vaga.encerrada != null and vaga.encerrada}"
+                          class="px-3 py-1 rounded-xl bg-slate-950 border border-slate-800 text-slate-500 text-xs">
+                        Atribuições bloqueadas
+                    </span>
                 </div>
             </div>
 
@@ -310,6 +382,48 @@
                 <p class="text-xs text-slate-400">Assim que profissionais se candidatarem a esta vaga, eles aparecerão aqui para triagem.</p>
             </div>
         </section>
+
+        <!-- Modal de Encerramento de Vaga (Apenas ADMIN e RECRUTADOR) -->
+        <div id="modalEncerrar" sec:authorize="hasAnyRole('ADMIN', 'RECRUTADOR')" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl shadow-slate-950 transform scale-95 transition-transform duration-200" id="modalEncerrarCard">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Deseja encerrar esta vaga?</h3>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-0.5">Novas candidaturas serão bloqueadas imediatamente.</p>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 text-xs text-slate-300">
+                    <p><strong>Empresa: </strong><span th:text="${vaga.empresa}">Empresa</span></p>
+                    <p class="truncate mt-1"><strong>Nível: </strong><span th:text="${vaga.level}">Pleno</span></p>
+                    <p class="mt-2 text-slate-400">Os candidatos já inscritos continuarão no processo para avaliação dos recrutadores.</p>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 mt-6">
+                    <button type="button" 
+                            onclick="fecharModalEncerrar()" 
+                            class="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs sm:text-sm font-medium transition-colors cursor-pointer">
+                        Cancelar
+                    </button>
+                    
+                    <form th:action="@{/vagas/{id}/encerrar(id=${vaga.id})}" method="post" class="inline">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" 
+                                class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-semibold transition-colors shadow-lg shadow-amber-600/30 cursor-pointer flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <span>Sim, Encerrar Vaga</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Modal de Confirmação de Exclusão -->
         <div id="modalExclusao" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
@@ -402,6 +516,28 @@
         </div>
 
         <script th:inline="javascript">
+            function abrirModalEncerrar() {
+                const modal = document.getElementById('modalEncerrar');
+                if (!modal) return;
+                const card = document.getElementById('modalEncerrarCard');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    card.classList.remove('scale-95');
+                }, 10);
+            }
+
+            function fecharModalEncerrar() {
+                const modal = document.getElementById('modalEncerrar');
+                if (!modal) return;
+                const card = document.getElementById('modalEncerrarCard');
+                modal.classList.add('opacity-0');
+                card.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 200);
+            }
+
             function abrirModalExclusao() {
                 const modal = document.getElementById('modalExclusao');
                 const card = document.getElementById('modalExclusaoCard');

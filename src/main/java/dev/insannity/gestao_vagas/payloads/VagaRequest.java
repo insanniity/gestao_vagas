@@ -34,12 +34,15 @@ public class VagaRequest {
     @Size(max = 1000, message = "Os benefícios não podem exceder 1000 caracteres.")
     String beneficios;
 
+    Boolean encerrada;
+
     public Vaga toModel() {
         return Vaga.builder()
                 .empresa(this.empresa != null ? this.empresa.trim() : null)
                 .level(this.level != null ? this.level.trim().toUpperCase() : null)
                 .descricao(this.descricao != null ? this.descricao.trim() : null)
                 .beneficios(this.beneficios != null ? this.beneficios.trim() : null)
+                .encerrada(Boolean.TRUE.equals(this.encerrada))
                 .build();
     }
 
@@ -49,6 +52,7 @@ public class VagaRequest {
                 .level(vaga.getLevel())
                 .descricao(vaga.getDescricao())
                 .beneficios(vaga.getBeneficios())
+                .encerrada(vaga.isEncerrada())
                 .build();
     }
 }

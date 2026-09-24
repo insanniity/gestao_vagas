@@ -33,6 +33,23 @@ public class ControllerExceptionHandler {
         return modelAndView;
     }
 
+    @ExceptionHandler(RegraNegocioException.class)
+    public Object handleRegraNegocio(RegraNegocioException e, HttpServletRequest request) {
+        log.warn("Regra de negócio violada ao acessar '{}': {}", request.getRequestURI(), e.getMessage());
+
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError error = new StandardError(
+            status.value(),
+            status.getReasonPhrase(),
+            e.getMessage(),
+            request.getRequestURI()
+        );
+        ModelAndView modelAndView = new ModelAndView("errors/error");
+        modelAndView.setStatus(status);
+        modelAndView.addObject("error", error);
+        return modelAndView;
+    }
+
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public Object handleAccessDenied(org.springframework.security.access.AccessDeniedException e, HttpServletRequest request) {
         log.warn("Acesso negado para '{}': {}", request.getRequestURI(), e.getMessage());
